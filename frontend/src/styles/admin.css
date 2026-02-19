@@ -1,0 +1,94 @@
+@import "tailwindcss";
+
+/* Override global portfolio styles for admin */
+.admin-root {
+  color: #fafafa;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 1rem;
+}
+
+/* Reset only links (global styles.css sets a { color: #000 }) */
+.admin-root a {
+  color: inherit;
+}
+
+/* Force dark text on white-bg buttons (Tailwind layers can't override unlayered styles) */
+.admin-root button.bg-white,
+.admin-root a.bg-white {
+  color: #18181b;
+}
+
+/* Reset font/spacing overrides from portfolio CSS */
+.admin-root a,
+.admin-root button,
+.admin-root input,
+.admin-root textarea,
+.admin-root select,
+.admin-root label,
+.admin-root p,
+.admin-root span,
+.admin-root li,
+.admin-root h1,
+.admin-root h2,
+.admin-root h3,
+.admin-root h4 {
+  font-family: inherit;
+  font-size: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+/* TipTap editor styles */
+.tiptap-editor .ProseMirror {
+  min-height: 150px;
+  padding: 1rem;
+  outline: none;
+}
+
+.tiptap-editor .ProseMirror p {
+  margin-bottom: 0.75rem;
+}
+
+.tiptap-editor .ProseMirror a {
+  color: #60a5fa;
+  text-decoration: underline;
+}
+
+.tiptap-editor .ProseMirror p.is-editor-empty:first-child::before {
+  color: #52525b;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Dropzone styles */
+.dropzone-active {
+  border-color: #3b82f6 !important;
+  background-color: rgba(59, 130, 246, 0.05) !important;
+}
+
+/* Sortable drag overlay */
+.sortable-ghost {
+  opacity: 0.4;
+}
+
+.sortable-drag {
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Custom scrollbar for admin */
+.admin-root ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.admin-root ::-webkit-scrollbar-track {
+  background: transparent;
+}
+.admin-root ::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  border-radius: 3px;
+}
+.admin-root ::-webkit-scrollbar-thumb:hover {
+  background: #52525b;
+}
