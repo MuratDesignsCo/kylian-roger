@@ -1,0 +1,1 @@
+{"version":3,"file":"settings.d.ts","sourceRoot":"","sources":["../../../src/schema/resolvers/settings.ts"],"names":[],"mappings":"AACA,OAAO,EAAe,KAAK,UAAU,EAAE,MAAM,eAAe,CAAA;AAE5D,eAAO,MAAM,iBAAiB;;;;;4BASA,OAAO,aAAa;YAAE,KAAK,EAAE,MAAM,CAAC,MAAM,EAAE,OAAO,CAAC,CAAA;SAAE,WAAW,UAAU;;CA4BxG,CAAA"}
