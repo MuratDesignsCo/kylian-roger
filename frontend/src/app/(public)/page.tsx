@@ -24,7 +24,7 @@ const defaultHeroImages: HeroImage[] = [
 ]
 
 // Fallback about text (from original static HTML)
-const defaultAboutHtml = `Kylian works across <a href="/photography" class="about-hover-link" data-hover-img="/images/blank.jpg"><span class="gif photography">photography</span></a>, <a href="/film-motion" class="about-hover-link" data-hover-img="/images/blank.jpg"><span class="gif directing">directing</span></a>, and <a href="/art-direction" class="about-hover-link" data-hover-img="/images/blank.jpg"><span class="gif art-directing">art direction</span></a>, creating advertising work in automotive, sport, and lifestyle, with a parallel editorial practice and independent creative projects that explore identity.`
+const defaultAboutHtml = `Kylian works across <a href="/photography" class="about-hover-link" data-hover-img="/images/blank.jpg"><span class="gif photography">photography</span></a>, <a href="/film-motion" class="about-hover-link" data-hover-img="/images/blank.jpg"><span class="gif directing">directing</span></a>, and <a href="/art-direction" class="about-hover-link" data-hover-img="/images/blank.jpg"><span class="gif art-direction">art direction</span></a>, creating advertising work in automotive, sport, and lifestyle, with a parallel editorial practice and independent creative projects that explore identity.`
 
 // Fallback works section links (from original static HTML)
 const defaultWorksLinks: WorksSectionLink[] = [
