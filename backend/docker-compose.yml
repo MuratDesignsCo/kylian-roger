@@ -16,7 +16,8 @@ services:
       retries: 5
 
   api:
-    build: .
+    image: ghcr.io/muratdesignsco/kylian-roger-backend:latest
+    # build: .  # décommenter pour build local
     restart: unless-stopped
     depends_on:
       postgres:
