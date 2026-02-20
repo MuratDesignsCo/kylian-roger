@@ -1,0 +1,44 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          push: true
+          tags: ghcr.io/muratdesignsco/kylian-roger-backend:latest
+
+      - name: Deploy on VPS
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_BACKEND_HOST }}
+          username: ${{ secrets.VPS_BACKEND_USER }}
+          key: ${{ secrets.VPS_BACKEND_SSH_KEY }}
+          script: |
+            cd /opt/kylian-roger/backend
+            docker compose pull api
+            docker compose up -d
+            docker image prune -f
