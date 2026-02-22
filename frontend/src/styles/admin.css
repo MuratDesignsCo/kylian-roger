@@ -1,21 +1,40 @@
 @import "tailwindcss";
 
-/* Override global portfolio styles for admin */
+/* ============================================================
+   Admin overrides — UNLAYERED to beat global styles.css rules
+   (body { color: var(--text-color--text-primary) }, a { color: var(...) })
+   ============================================================ */
+
+/* Base admin reset — uses BDO Grotesk like the public site */
 .admin-root {
-  color: #fafafa;
-  font-family: ui-sans-serif, system-ui, sans-serif;
-  font-size: 1rem;
+  color: #000;
+  font-family: "Bdogrotesk Vf", ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
 }
 
-/* Reset only links (global styles.css sets a { color: #000 }) */
 .admin-root a {
   color: inherit;
 }
 
-/* Force dark text on white-bg buttons (Tailwind layers can't override unlayered styles) */
-.admin-root button.bg-white,
-.admin-root a.bg-white {
-  color: #18181b;
+/* Fix: Tailwind utilities live in @layer → unlayered CSS beats them.
+   Force both background + text on dark buttons/links. */
+.admin-root button[class*="bg-black"],
+.admin-root a[class*="bg-black"] {
+  background-color: #000;
+  color: #fff;
+}
+.admin-root button[class*="bg-black"]:hover,
+.admin-root a[class*="bg-black"]:hover {
+  background-color: #1f2937;
+  color: #fff;
+}
+.admin-root button[class*="bg-black"]:disabled {
+  background-color: #000;
+  color: #fff;
+  opacity: 0.5;
 }
 
 /* Reset font/spacing overrides from portfolio CSS */
@@ -34,15 +53,248 @@
 .admin-root h4 {
   font-family: inherit;
   font-size: inherit;
-  letter-spacing: normal;
+  letter-spacing: inherit;
   text-transform: none;
 }
 
-/* TipTap editor styles */
+/* ============================================================
+   Admin typography
+   ============================================================ */
+
+.admin-root h1 {
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.admin-root h2 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  color: #000;
+}
+
+/* ============================================================
+   Admin inputs — minimal, underline-style
+   ============================================================ */
+
+.admin-root input[type="text"],
+.admin-root input[type="email"],
+.admin-root input[type="password"],
+.admin-root input[type="url"],
+.admin-root input[type="number"],
+.admin-root textarea,
+.admin-root select {
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #000;
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid #ccc;
+  border-radius: 0;
+  padding: 0.625rem 0;
+  outline: none;
+  transition: border-color 0.2s ease;
+  width: 100%;
+}
+
+.admin-root input[type="text"]:focus,
+.admin-root input[type="email"]:focus,
+.admin-root input[type="password"]:focus,
+.admin-root input[type="url"]:focus,
+.admin-root input[type="number"]:focus,
+.admin-root textarea:focus,
+.admin-root select:focus {
+  border-bottom-color: #000;
+}
+
+.admin-root input::placeholder,
+.admin-root textarea::placeholder {
+  color: #ccc;
+  font-weight: 400;
+}
+
+.admin-root select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23757575' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0 center;
+  padding-right: 1.25rem;
+}
+
+/* Admin labels */
+.admin-root label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #757575;
+  margin-bottom: 0.25rem;
+}
+
+/* ============================================================
+   Admin buttons — pill-shaped like the public site
+   ============================================================ */
+
+.admin-root .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #000;
+  color: #fff;
+  border: 1px solid #000;
+  border-radius: 25rem;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.2s ease-out, color 0.2s ease-out;
+}
+
+.admin-root .btn-primary:hover {
+  background-color: transparent;
+  color: #000;
+}
+
+.admin-root .btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.admin-root .btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  background-color: transparent;
+  color: #000;
+  border: 1px solid #ccc;
+  border-radius: 25rem;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.2s ease-out, color 0.2s ease-out, border-color 0.2s ease-out;
+}
+
+.admin-root .btn-secondary:hover {
+  border-color: #000;
+  background-color: #000;
+  color: #fff;
+}
+
+/* ============================================================
+   Admin sections / cards
+   ============================================================ */
+
+.admin-root .admin-section {
+  padding: 2.5rem 0;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.admin-root .admin-section:last-child {
+  border-bottom: none;
+}
+
+/* ============================================================
+   Sidebar — colors handled in CSS (not Tailwind) because
+   global styles.css a { color: var(...) } is unlayered and
+   beats all Tailwind utility classes
+   ============================================================ */
+
+.admin-root aside {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  color: #a1a1aa;
+}
+
+.admin-root aside > nav {
+  flex: 1 1 0%;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Links & buttons: base state */
+.admin-root aside a,
+.admin-root aside button {
+  color: inherit;
+}
+
+/* Main nav links */
+.admin-root aside .sidebar-link {
+  color: #a1a1aa;
+}
+.admin-root aside .sidebar-link:hover {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+.admin-root aside .sidebar-link.active {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Dropdown toggle buttons (Pages, Works) */
+.admin-root aside .sidebar-dropdown {
+  color: #a1a1aa;
+}
+.admin-root aside .sidebar-dropdown:hover {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+.admin-root aside .sidebar-dropdown.active {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Sub-links inside dropdowns */
+.admin-root aside .sidebar-sub {
+  color: #71717a;
+}
+.admin-root aside .sidebar-sub:hover {
+  color: #fff;
+}
+.admin-root aside .sidebar-sub.active {
+  color: #fff;
+}
+
+/* Logout */
+.admin-root aside .sidebar-logout {
+  color: #71717a;
+  opacity: 0.7;
+}
+.admin-root aside .sidebar-logout:hover {
+  color: #f87171;
+  opacity: 1;
+}
+
+/* ============================================================
+   TipTap editor
+   ============================================================ */
+
+.tiptap-editor {
+  border: 1px solid #e5e5e5;
+  border-radius: 0;
+  background-color: #fafafa;
+  transition: border-color 0.2s ease;
+}
+
+.tiptap-editor:focus-within {
+  border-color: #000;
+}
+
 .tiptap-editor .ProseMirror {
   min-height: 150px;
   padding: 1rem;
   outline: none;
+  font-size: 0.875rem;
+  line-height: 1.6;
 }
 
 .tiptap-editor .ProseMirror p {
@@ -50,45 +302,171 @@
 }
 
 .tiptap-editor .ProseMirror a {
-  color: #60a5fa;
+  color: #000;
   text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+  text-decoration-color: #999;
+  transition: text-decoration-color 0.15s ease;
+  pointer-events: auto;
+  cursor: text;
+}
+
+.tiptap-editor .ProseMirror a:hover {
+  text-decoration-color: #000;
 }
 
 .tiptap-editor .ProseMirror p.is-editor-empty:first-child::before {
-  color: #52525b;
+  color: #ccc;
   content: attr(data-placeholder);
   float: left;
   height: 0;
   pointer-events: none;
 }
 
-/* Dropzone styles */
+/* ============================================================
+   Dropzone / Sortable / Scrollbar
+   ============================================================ */
+
 .dropzone-active {
-  border-color: #3b82f6 !important;
-  background-color: rgba(59, 130, 246, 0.05) !important;
+  border-color: #000 !important;
+  background-color: rgba(0, 0, 0, 0.02) !important;
 }
 
-/* Sortable drag overlay */
 .sortable-ghost {
   opacity: 0.4;
 }
 
 .sortable-drag {
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
 }
 
-/* Custom scrollbar for admin */
+/* Hero images grid — horizontal sortable */
+.hero-image-thumb {
+  position: relative;
+  aspect-ratio: 3/4;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid #e5e5e5;
+  transition: border-color 0.2s ease;
+}
+
+.hero-image-thumb:hover {
+  border-color: #000;
+}
+
+.hero-image-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-image-thumb .hero-image-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-image-thumb:hover .hero-image-overlay {
+  opacity: 1;
+}
+
+/* Add image placeholder */
+.hero-image-add {
+  aspect-ratio: 3/4;
+  border: 1px dashed #ccc;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #757575;
+}
+
+.hero-image-add:hover {
+  border-color: #000;
+  color: #000;
+}
+
+/* SVG logo preview */
+.svg-logo-preview {
+  position: relative;
+  padding: 1.5rem 2rem;
+  border: 1px solid #e5e5e5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s ease;
+}
+
+.svg-logo-preview.is-dark {
+  background-color: #000;
+}
+
+.svg-logo-preview.is-light {
+  background-color: #fff;
+}
+
+/* Scrollbar */
 .admin-root ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 4px;
+  height: 4px;
 }
 .admin-root ::-webkit-scrollbar-track {
   background: transparent;
 }
 .admin-root ::-webkit-scrollbar-thumb {
-  background: #3f3f46;
-  border-radius: 3px;
+  background: #e5e5e5;
+  border-radius: 2px;
 }
 .admin-root ::-webkit-scrollbar-thumb:hover {
-  background: #52525b;
+  background: #ccc;
+}
+
+/* ============================================================
+   PageTabs override
+   ============================================================ */
+.admin-root .page-tabs {
+  display: flex;
+  gap: 2rem;
+  border-bottom: 1px solid #e5e5e5;
+  margin-bottom: 0;
+}
+
+.admin-root .page-tabs button {
+  padding-bottom: 0.75rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #ccc;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  position: relative;
+}
+
+.admin-root .page-tabs button:hover {
+  color: #757575;
+}
+
+.admin-root .page-tabs button.active {
+  color: #000;
+}
+
+.admin-root .page-tabs button.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #000;
 }

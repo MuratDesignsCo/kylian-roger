@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { Upload, X, Loader2 } from 'lucide-react'
 import { getAuthToken } from '@/components/admin/AuthGuard'
+import { UPLOAD_URL } from '@/lib/graphql/client'
 
 interface ImageUploadProps {
   value: string
@@ -12,6 +13,7 @@ interface ImageUploadProps {
   folder?: string
   accept?: 'image' | 'video'
   label?: string
+  aspectRatio?: string
 }
 
 const IMAGE_ACCEPT = {
@@ -19,6 +21,7 @@ const IMAGE_ACCEPT = {
   'image/png': ['.png'],
   'image/webp': ['.webp'],
   'image/avif': ['.avif'],
+  'image/svg+xml': ['.svg'],
 }
 
 const VIDEO_ACCEPT = {
@@ -37,6 +40,7 @@ export default function ImageUpload({
   folder = '',
   accept = 'image',
   label,
+  aspectRatio,
 }: ImageUploadProps) {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -58,7 +62,7 @@ export default function ImageUpload({
         formData.append('file', file)
 
         const token = getAuthToken()
-        const res = await fetch(process.env.NEXT_PUBLIC_UPLOAD_URL || '/api/upload', {
+        const res = await fetch(UPLOAD_URL, {
           method: 'POST',
           headers: token ? { 'Authorization': `Bearer ${token}` } : {},
           body: formData,
@@ -108,7 +112,7 @@ export default function ImageUpload({
   return (
     <div className="space-y-2">
       {label && (
-        <label className="block text-sm font-medium text-zinc-300">
+        <label className="block text-sm font-medium text-gray-700">
           {label}
         </label>
       )}
@@ -118,8 +122,8 @@ export default function ImageUpload({
           {isVideo ? (
             <video
               src={value}
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-800 object-cover"
-              style={{ maxHeight: '240px' }}
+              className="w-full rounded-lg border border-gray-200 bg-gray-50 object-cover"
+              style={aspectRatio ? { aspectRatio } : { maxHeight: '240px' }}
               controls
               muted
             />
@@ -127,14 +131,14 @@ export default function ImageUpload({
             <img
               src={value}
               alt="Preview"
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-800 object-cover"
-              style={{ maxHeight: '240px' }}
+              className="w-full rounded-lg border border-gray-200 bg-gray-50 object-cover"
+              style={aspectRatio ? { aspectRatio } : { maxHeight: '240px' }}
             />
           )}
           <button
             type="button"
             onClick={handleRemove}
-            className="absolute top-2 right-2 rounded-full bg-zinc-900/80 p-1.5 text-zinc-400 opacity-0 transition-opacity hover:bg-zinc-900 hover:text-white group-hover:opacity-100"
+            className="absolute top-2 right-2 rounded-full bg-white/90 p-1.5 text-gray-500 shadow-sm opacity-0 transition-opacity hover:bg-white hover:text-gray-900 group-hover:opacity-100"
           >
             <X className="h-4 w-4" />
           </button>
@@ -142,27 +146,28 @@ export default function ImageUpload({
       ) : (
         <div
           {...getRootProps()}
+          style={aspectRatio ? { aspectRatio } : undefined}
           className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed px-6 py-10 transition-colors ${
             isDragActive
               ? 'border-blue-500 bg-blue-500/10'
-              : 'border-zinc-700 bg-zinc-800 hover:border-zinc-500'
+              : 'border-gray-300 bg-gray-50 hover:border-gray-400'
           } ${uploading ? 'pointer-events-none opacity-50' : ''}`}
         >
           <input {...getInputProps()} />
           {uploading ? (
             <>
-              <Loader2 className="mb-3 h-8 w-8 animate-spin text-zinc-400" />
-              <p className="text-sm text-zinc-400">Uploading...</p>
+              <Loader2 className="mb-3 h-8 w-8 animate-spin text-gray-500" />
+              <p className="text-sm text-gray-500">Uploading...</p>
             </>
           ) : (
             <>
-              <Upload className="mb-3 h-8 w-8 text-zinc-400" />
-              <p className="text-sm text-zinc-400">
+              <Upload className="mb-3 h-8 w-8 text-gray-500" />
+              <p className="text-sm text-gray-500">
                 {isDragActive
                   ? 'Drop the file here'
                   : `Drag & drop or click to upload ${isVideo ? 'a video' : 'an image'}`}
               </p>
-              <p className="mt-1 text-xs text-zinc-500">
+              <p className="mt-1 text-xs text-gray-400">
                 Max {isVideo ? '100MB' : '5MB'}
               </p>
             </>
@@ -171,7 +176,7 @@ export default function ImageUpload({
       )}
 
       {error && (
-        <p className="text-sm text-red-400">{error}</p>
+        <p className="text-sm text-red-500">{error}</p>
       )}
     </div>
   )

@@ -14,8 +14,15 @@ const typeDefs = gql`
     about_text_html: String!
     works_section_title: String!
     works_section_links: JSON!
+    works_section_subtitle: String!
+    hero_logo_top_url: String!
+    hero_logo_bottom_url: String!
     footer_big_name: String!
     copyright_text: String!
+    navbar_logo_url: String!
+    footer_logo_url: String!
+    nav_menu_order: JSON!
+    nav_dropdown_order: JSON!
     updated_at: String!
   }
 
@@ -27,6 +34,14 @@ const typeDefs = gql`
     og_title: String!
     og_description: String!
     og_image_url: String!
+    updated_at: String!
+  }
+
+  type PageSettings {
+    page_slug: String!
+    page_title: String
+    items_per_page: Int!
+    items_per_page_alt: Int
     updated_at: String!
   }
 
@@ -52,6 +67,7 @@ const typeDefs = gql`
     cover_image_url: String!
     cover_image_alt: String!
     year: Int!
+    project_date: String
     sort_order: Int!
     is_published: Boolean!
     created_at: String!
@@ -68,6 +84,12 @@ const typeDefs = gql`
     art_tags: [String!]
     art_hero_label: String
     card_label: String
+    # SEO fields (per-project meta for /works/[slug] pages)
+    meta_title: String!
+    meta_description: String!
+    og_title: String!
+    og_description: String!
+    og_image_url: String!
     # Nested relations (resolved on demand)
     gallery_rows: [ProjectGalleryRow!]
     hero_slides: [ProjectHeroSlide!]
@@ -214,6 +236,7 @@ const typeDefs = gql`
     settings: SiteSettings
     seoPages: [PageSeo!]!
     seoPage(slug: String!): PageSeo
+    pageSettings(slug: String!): PageSettings
     homepage: HomepageData!
     projects(category: String, published: Boolean): [Project!]!
     project(slug: String!): Project
@@ -239,8 +262,15 @@ const typeDefs = gql`
     about_text_html: String
     works_section_title: String
     works_section_links: JSON
+    works_section_subtitle: String
+    hero_logo_top_url: String
+    hero_logo_bottom_url: String
     footer_big_name: String
     copyright_text: String
+    navbar_logo_url: String
+    footer_logo_url: String
+    nav_menu_order: JSON
+    nav_dropdown_order: JSON
   }
 
   input SeoPageInput {
@@ -253,6 +283,13 @@ const typeDefs = gql`
     og_image_url: String
   }
 
+  input PageSettingsInput {
+    page_slug: String!
+    page_title: String
+    items_per_page: Int
+    items_per_page_alt: Int
+  }
+
   input ProjectInput {
     slug: String!
     category: String!
@@ -260,6 +297,7 @@ const typeDefs = gql`
     cover_image_url: String
     cover_image_alt: String
     year: Int
+    project_date: String
     sort_order: Int
     is_published: Boolean
     photo_subcategory: String
@@ -274,6 +312,11 @@ const typeDefs = gql`
     art_tags: [String!]
     art_hero_label: String
     card_label: String
+    meta_title: String
+    meta_description: String
+    og_title: String
+    og_description: String
+    og_image_url: String
   }
 
   input HeroImageInput {
@@ -334,11 +377,19 @@ const typeDefs = gql`
     sort_order: Int
   }
 
+  input MediaKitButtonInput {
+    id: ID
+    label: String!
+    file_url: String!
+    sort_order: Int
+  }
+
   input ContactInput {
     page: ContactPageInput
     infoBlocks: [ContactInfoBlockInput!]
     awards: [AwardInput!]
     btsImages: [BtsImageInput!]
+    mediaKitButtons: [MediaKitButtonInput!]
   }
 
   input GalleryRowInput {
@@ -395,6 +446,9 @@ const typeDefs = gql`
 
     # SEO
     upsertSeoPages(input: [SeoPageInput!]!): [PageSeo!]!
+
+    # Page Settings
+    upsertPageSettings(input: PageSettingsInput!): PageSettings!
 
     # Projects
     createProject(input: ProjectInput!): Project!

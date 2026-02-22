@@ -107,7 +107,7 @@ function SortableItem({
     <div ref={setNodeRef} style={style} className="flex items-start gap-2">
       <button
         type="button"
-        className="mt-2 flex-shrink-0 cursor-grab rounded p-1 text-zinc-500 hover:bg-zinc-700 hover:text-zinc-300 active:cursor-grabbing"
+        className="mt-2 flex-shrink-0 cursor-grab rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700 active:cursor-grabbing"
         {...attributes}
         {...listeners}
       >

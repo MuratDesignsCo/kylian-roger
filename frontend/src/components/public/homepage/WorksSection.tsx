@@ -10,12 +10,14 @@ gsap.registerPlugin(ScrollTrigger)
 
 interface WorksSectionProps {
   title: string
+  subtitle?: string
   links: WorksSectionLink[]
   featuredWorks: HomepageFeaturedWork[]
 }
 
 export default function WorksSection({
   title,
+  subtitle = 'Explore more',
   links,
   featuredWorks,
 }: WorksSectionProps) {
@@ -185,9 +187,6 @@ export default function WorksSection({
     }
   }, [featuredWorks])
 
-  // Parse title for line breaks
-  const titleLines = title.split('\n')
-
   return (
     <section id="works" className="section_home_works" ref={sectionRef} style={{ backgroundColor: '#000000' }}>
       <div className="home_works_background">
@@ -197,22 +196,33 @@ export default function WorksSection({
             <div className="home_works_headline-button">
               <div className="works_headline--desktop">
                 <h2 className="heading-style-h1 text-color-alternate text-align-center">
-                  {titleLines.map((line, i) => (
-                    <span key={i}>
-                      {line}
-                      {i < titleLines.length - 1 && <br />}
-                    </span>
-                  ))}
+                  {title}
                 </h2>
               </div>
               <div className="works_headline--tablet-mobile">
                 <h2 className="heading-style-h1 text-color-alternate text-align-center">
-                  FEATURED <br />
-                  WORKS
+                  {title}
                 </h2>
               </div>
               <div className="works_button--desktop">
-                <p className="paragraph">Explore more</p>
+                <p className="paragraph">{subtitle}</p>
+                <div className="button-wrapper">
+                  {links.map((link, i) => (
+                    <Link
+                      key={i}
+                      href={fixHref(link.href)}
+                      className="button is-secondary inline-block"
+                    >
+                      <div className="button_text-wrapper">
+                        <div className="button_text">{link.label}</div>
+                        <div className="button_text is-absolute">{link.label}</div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+              <div className="works_button--tablet-mobile">
+                <p className="paragraph">{subtitle}</p>
                 <div className="button-wrapper">
                   {links.map((link, i) => (
                     <Link
@@ -274,17 +284,6 @@ export default function WorksSection({
                   </div>
                 )
               })}
-            </div>
-            <div className="home_works_button--tablet-mobile">
-              <Link
-                href="/photography"
-                className="button is-secondary inline-block"
-              >
-                <div className="button_text-wrapper">
-                  <div className="button_text">VIEW ALL WORKS</div>
-                  <div className="button_text is-absolute">VIEW ALL WORKS</div>
-                </div>
-              </Link>
             </div>
           </div>
           <div className="home_works_spacer"></div>

@@ -102,10 +102,10 @@ export default function PhotographyGallery({
           onReorder={handleReorder}
           getId={(row) => row.id}
           renderItem={(row, index) => (
-            <div className="rounded-lg border border-zinc-700 bg-zinc-800/50 p-4">
+            <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
               <div className="mb-3 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <span className="text-xs font-medium text-zinc-500 uppercase">
+                  <span className="text-xs font-medium text-gray-500 uppercase">
                     Row {index + 1}
                   </span>
                   <select
@@ -113,7 +113,7 @@ export default function PhotographyGallery({
                     onChange={(e) =>
                       handleRowLayoutChange(index, e.target.value as RowLayout)
                     }
-                    className="rounded border border-zinc-700 bg-zinc-800 px-2 py-1 text-sm text-zinc-200 focus:border-zinc-500 focus:outline-none"
+                    className="rounded border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900 focus:border-blue-500 focus:outline-none"
                   >
                     {LAYOUT_OPTIONS.map((opt) => (
                       <option key={opt.value} value={opt.value}>
@@ -125,7 +125,7 @@ export default function PhotographyGallery({
                 <button
                   type="button"
                   onClick={() => handleRemoveRow(index)}
-                  className="rounded p-1.5 text-zinc-500 transition-colors hover:bg-zinc-700 hover:text-red-400"
+                  className="rounded p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-red-500"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
@@ -151,7 +151,7 @@ export default function PhotographyGallery({
         <select
           value={addLayout}
           onChange={(e) => setAddLayout(e.target.value as RowLayout)}
-          className="rounded border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-200 focus:border-zinc-500 focus:outline-none"
+          className="rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none"
         >
           {LAYOUT_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -162,7 +162,7 @@ export default function PhotographyGallery({
         <button
           type="button"
           onClick={handleAddRow}
-          className="inline-flex items-center gap-2 rounded-lg bg-zinc-700 px-4 py-2 text-sm font-medium text-zinc-200 transition-colors hover:bg-zinc-600"
+          className="inline-flex items-center gap-2 rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200"
         >
           <Plus className="h-4 w-4" />
           Add row

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useMemo } from 'react'
 import gsap from 'gsap'
 import { rewriteCmsLinks } from '@/lib/utils'
 import type { AboutHoverImage } from '@/lib/types'
@@ -14,33 +14,46 @@ export default function AboutSection({ html, hoverImages }: AboutSectionProps) {
   const sectionRef = useRef<HTMLElement>(null)
   const cursorRef = useRef<HTMLDivElement>(null)
   const cursorImgRef = useRef<HTMLImageElement>(null)
+  const tweenRef = useRef<gsap.core.Tween | null>(null)
 
-  // Build hover image map from DB data
-  const hoverImageMap: Record<string, string> = {}
-  hoverImages.forEach((img) => {
-    hoverImageMap[img.link_identifier] = img.image_url
-  })
+  // Build hover image map: link_identifier → image_url (stable ref)
+  const hoverImageMap = useMemo(() => {
+    const map: Record<string, string> = {}
+    hoverImages.forEach((img) => {
+      if (img.image_url) map[img.link_identifier] = img.image_url
+    })
+    return map
+  }, [hoverImages])
 
-  // Process the HTML to inject hover images and rewrite links
-  let processedHtml = rewriteCmsLinks(html)
-  // Replace blank.jpg placeholders with actual hover images
-  Object.entries(hoverImageMap).forEach(([identifier, url]) => {
-    if (url) {
-      const regex = new RegExp(
-        `(<a[^>]*class="about-hover-link"[^>]*data-hover-img=")([^"]*)(")`,
-        'g'
-      )
-      // Match by link identifier in the span class
-      processedHtml = processedHtml.replace(
-        new RegExp(
-          `(<a[^>]*data-hover-img=")([^"]*)("[^>]*>\\s*<span[^>]*class="gif ${identifier}")`,
-          'g'
-        ),
-        `$1${url}$3`
-      )
-    }
-  })
+  // Process HTML: rewrite links, then enrich all <a> tags for hover effect
+  const processedHtml = useMemo(() => {
+    let result = rewriteCmsLinks(html)
 
+    result = result.replace(/<a\s+([^>]*)>/g, (_match, attrs: string) => {
+      const hrefMatch = attrs.match(/href="([^"]*)"/)
+      const href = hrefMatch ? hrefMatch[1] : ''
+      const imgUrl = hoverImageMap[href] || ''
+
+      let cleanAttrs = attrs
+        .replace(/\s*class="[^"]*"/g, '')
+        .replace(/\s*data-hover-img="[^"]*"/g, '')
+        .trim()
+
+      return `<a class="about-hover-link" data-hover-img="${imgUrl}" ${cleanAttrs}>`
+    })
+
+    return result
+  }, [html, hoverImageMap])
+
+  // Pre-load hover images so they display instantly on hover
+  useEffect(() => {
+    Object.values(hoverImageMap).forEach((url) => {
+      const img = new Image()
+      img.src = url
+    })
+  }, [hoverImageMap])
+
+  // Setup hover event listeners
   useEffect(() => {
     const section = sectionRef.current
     const cursorEl = cursorRef.current
@@ -50,42 +63,56 @@ export default function AboutSection({ html, hoverImages }: AboutSectionProps) {
     const hoverLinks = section.querySelectorAll<HTMLElement>('.about-hover-link')
     if (!hoverLinks.length) return
 
-    let cursorTween: gsap.core.Tween | null = null
+    // Ensure cursor starts fully hidden
+    gsap.set(cursorEl, { opacity: 0, clipPath: 'inset(50% 50% 50% 50%)' })
+
     const cleanups: (() => void)[] = []
+    let isVisible = false
 
     hoverLinks.forEach((link) => {
       const onEnter = (e: MouseEvent) => {
         const src = link.getAttribute('data-hover-img')
-        if (src) cursorImg.src = src
+        if (!src) return
 
-        cursorEl.style.left = e.clientX + 'px'
-        cursorEl.style.top = e.clientY + 'px'
+        cursorImg.src = src
+
+        // Position instantly to avoid first-frame lag
+        gsap.set(cursorEl, { left: e.clientX, top: e.clientY })
 
         link.classList.add('is-hovered')
+        isVisible = true
 
-        if (cursorTween) cursorTween.kill()
-        cursorTween = gsap.fromTo(
-          cursorEl,
-          { clipPath: 'inset(50% 50% 50% 50%)', scale: 1.15 },
-          { clipPath: 'inset(0% 0% 0% 0%)', scale: 1, duration: 0.6, ease: 'power3.out' }
-        )
+        if (tweenRef.current) tweenRef.current.kill()
+        tweenRef.current = gsap.to(cursorEl, {
+          opacity: 1,
+          clipPath: 'inset(0% 0% 0% 0%)',
+          scale: 1,
+          duration: 0.5,
+          ease: 'power3.out',
+        })
       }
 
       const onLeave = () => {
         link.classList.remove('is-hovered')
-        if (cursorTween) cursorTween.kill()
-        cursorTween = gsap.to(cursorEl, {
+
+        if (tweenRef.current) tweenRef.current.kill()
+        tweenRef.current = gsap.to(cursorEl, {
+          opacity: 0,
           clipPath: 'inset(50% 50% 50% 50%)',
           scale: 0.9,
-          duration: 0.4,
+          duration: 0.35,
           ease: 'power3.in',
+          onComplete: () => {
+            isVisible = false
+          },
         })
       }
 
       const onMove = (e: MouseEvent) => {
+        if (!isVisible) return
         gsap.to(cursorEl, {
-          left: e.clientX + 'px',
-          top: e.clientY + 'px',
+          left: e.clientX,
+          top: e.clientY,
           duration: 0.15,
           ease: 'power2.out',
         })
@@ -104,8 +131,13 @@ export default function AboutSection({ html, hoverImages }: AboutSectionProps) {
 
     return () => {
       cleanups.forEach((fn) => fn())
+      if (tweenRef.current) {
+        tweenRef.current.kill()
+        tweenRef.current = null
+      }
+      gsap.set(cursorEl, { opacity: 0, clipPath: 'inset(50% 50% 50% 50%)' })
     }
-  }, [html])
+  }, [processedHtml])
 
   if (!html) return null
 
@@ -117,7 +149,7 @@ export default function AboutSection({ html, hoverImages }: AboutSectionProps) {
           <div className="home_about_sticky">
             <div className="home_about_text-wrapper">
               <div className="home_about_text is-first-text">
-                <p
+                <div
                   className="text-size-large"
                   dangerouslySetInnerHTML={{ __html: processedHtml }}
                 />

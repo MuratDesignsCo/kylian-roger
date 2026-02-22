@@ -31,11 +31,15 @@ export const contactResolvers = {
     updateContact: async (_: unknown, { input }: { input: Record<string, unknown> }, context: GqlContext) => {
       requireAuth(context)
 
-      // Update contact page
+      // Upsert contact page (create row if it doesn't exist yet)
       if (input.page) {
         const page = input.page as Record<string, unknown>
         const fields = Object.keys(page).filter(k => page[k] !== undefined)
         if (fields.length > 0) {
+          // Ensure the 'main' row exists
+          await pool.query(
+            `INSERT INTO contact_page (id) VALUES ('main') ON CONFLICT (id) DO NOTHING`
+          )
           const setClauses = fields.map((f, i) => `${f} = $${i + 1}`)
           const values = fields.map(f => page[f])
           await pool.query(
@@ -77,6 +81,18 @@ export const contactResolvers = {
           await pool.query(
             'INSERT INTO bts_images (image_url, alt_text, sort_order) VALUES ($1, $2, $3)',
             [img.image_url, img.alt_text || 'Behind the scenes', img.sort_order || 0]
+          )
+        }
+      }
+
+      // Media kit buttons: delete all, re-insert
+      if (input.mediaKitButtons) {
+        await pool.query('DELETE FROM media_kit_buttons')
+        const buttons = input.mediaKitButtons as Array<Record<string, unknown>>
+        for (const btn of buttons) {
+          await pool.query(
+            'INSERT INTO media_kit_buttons (label, file_url, sort_order) VALUES ($1, $2, $3)',
+            [btn.label, btn.file_url || '', btn.sort_order || 0]
           )
         }
       }

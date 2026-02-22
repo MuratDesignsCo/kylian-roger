@@ -13,9 +13,13 @@ export default function AdminLayout({
         position="bottom-right"
         toastOptions={{
           style: {
-            background: '#18181b',
-            color: '#fafafa',
-            border: '1px solid #27272a',
+            background: '#000',
+            color: '#fff',
+            fontSize: '0.8125rem',
+            fontFamily: '"Bdogrotesk Vf", system-ui, sans-serif',
+            letterSpacing: '-0.01em',
+            borderRadius: '0',
+            padding: '0.75rem 1.25rem',
           },
         }}
       />

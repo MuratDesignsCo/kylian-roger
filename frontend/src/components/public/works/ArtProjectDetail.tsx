@@ -182,7 +182,7 @@ export default function ArtProjectDetail({
               </div>
 
               <div className="project-hero_title-front">
-                <span className="project-hero_title-text">{project.title}</span>
+                <h1 className="project-hero_title-text">{project.title}</h1>
               </div>
 
               <div className="project-hero_info">
@@ -248,6 +248,12 @@ export default function ArtProjectDetail({
                   <span className="project-details_meta-label text-color-secondary">ANNÉE</span>
                   <span className="project-details_meta-value">{project.year}</span>
                 </div>
+                {project.card_label && (
+                  <div className="project-details_meta-item">
+                    <span className="project-details_meta-label text-color-secondary">FEATURING</span>
+                    <span className="project-details_meta-value">{project.card_label}</span>
+                  </div>
+                )}
                 {project.art_tags && project.art_tags.length > 0 && (
                   <div className="project-details_meta-item">
                     <span className="project-details_meta-label text-color-secondary">CATÉGORIE</span>

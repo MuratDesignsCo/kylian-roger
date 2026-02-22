@@ -2,7 +2,22 @@
   "permissions": {
     "allow": [
       "Bash(npm run dev:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(curl:*)",
+      "Bash(python3:*)",
+      "Bash(npx tsc:*)",
+      "Bash(lsof:*)",
+      "Bash(xargs kill:*)",
+      "Bash(lighthouse:*)",
+      "Bash(node -e:*)",
+      "Bash(DATABASE_URL=\"postgresql://muratdesigns@localhost:5432/kylianroger\" node:*)",
+      "Bash(dropdb:*)",
+      "Bash(createdb:*)",
+      "Bash(psql:*)",
+      "Bash(DATABASE_URL=\"postgresql://muratdesigns@localhost:5432/kylianroger\" pnpm seed:*)",
+      "Bash(DATABASE_URL=postgresql://muratdesigns@localhost:5432/kylianroger node -e \"const b=require\\(''bcryptjs''\\),{Pool}=require\\(''pg''\\);\\(async\\(\\)=>{const p=new Pool\\({connectionString:process.env.DATABASE_URL}\\),h=await b.hash\\(''admin1234'',12\\);await p.query\\(''INSERT INTO admin_users\\(email,password_hash\\) VALUES\\($1,$2\\)'',[''admin@kylianroger.com'',h]\\);console.log\\(''Admin OK''\\);await p.end\\(\\)}\\)\\(\\)\")",
+      "Bash(DATABASE_URL=\"postgresql://muratdesigns@localhost:5432/kylianroger\" node -e:*)",
+      "Bash(DATABASE_URL=\"postgresql://muratdesigns@localhost:5432/kylianroger\" npx tsx -e:*)"
     ]
   }
 }

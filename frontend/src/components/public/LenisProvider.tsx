@@ -31,10 +31,12 @@ export default function LenisProvider({ children }: { children: ReactNode }) {
     setLenis(instance)
 
     instance.on('scroll', ScrollTrigger.update)
-    gsap.ticker.add((time) => instance.raf(time * 1000))
+    const tickerCallback = (time: number) => instance.raf(time * 1000)
+    gsap.ticker.add(tickerCallback)
     gsap.ticker.lagSmoothing(0)
 
     return () => {
+      gsap.ticker.remove(tickerCallback)
       instance.destroy()
       lenisRef.current = null
     }

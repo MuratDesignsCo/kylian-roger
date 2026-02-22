@@ -25,18 +25,18 @@ export default function LoginPage() {
       setAuthSession(data.login.token, data.login.user)
       router.push('/admin')
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Login failed')
+      toast.error(err instanceof Error ? err.message : 'Échec de la connexion')
       setLoading(false)
     }
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-950 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-white px-4">
       <div className="w-full max-w-sm">
         {/* Header */}
         <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold text-white">Connexion</h1>
-          <p className="mt-2 text-sm text-zinc-500">
+          <h1 className="text-2xl font-bold text-gray-900">Connexion</h1>
+          <p className="mt-2 text-sm text-gray-500">
             Panneau d&apos;administration
           </p>
         </div>
@@ -46,7 +46,7 @@ export default function LoginPage() {
           <div>
             <label
               htmlFor="email"
-              className="mb-1.5 block text-sm font-medium text-zinc-300"
+              className="mb-1.5 block text-sm font-medium text-gray-700"
             >
               Email
             </label>
@@ -56,7 +56,7 @@ export default function LoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="block w-full rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-white placeholder-zinc-600 outline-none transition-colors focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600"
+              className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 outline-none transition-colors focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               placeholder="admin@example.com"
             />
           </div>
@@ -64,7 +64,7 @@ export default function LoginPage() {
           <div>
             <label
               htmlFor="password"
-              className="mb-1.5 block text-sm font-medium text-zinc-300"
+              className="mb-1.5 block text-sm font-medium text-gray-700"
             >
               Mot de passe
             </label>
@@ -74,7 +74,7 @@ export default function LoginPage() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="block w-full rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-white placeholder-zinc-600 outline-none transition-colors focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600"
+              className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 outline-none transition-colors focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               placeholder="••••••••"
             />
           </div>
@@ -82,10 +82,10 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="flex w-full items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex w-full items-center justify-center rounded-md bg-black px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? (
-              <div className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-400 border-t-zinc-900" />
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-400 border-t-white" />
             ) : (
               'Se connecter'
             )}

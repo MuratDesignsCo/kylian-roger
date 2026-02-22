@@ -161,7 +161,7 @@ export default function PhotoProjectDetail({
             </div>
 
             <div className="project-hero_title-front">
-              <span className="project-hero_title-text">{project.title}</span>
+              <h1 className="project-hero_title-text">{project.title}</h1>
             </div>
 
             <div className="project-hero_info">

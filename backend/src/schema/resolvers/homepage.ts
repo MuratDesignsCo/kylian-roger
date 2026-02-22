@@ -62,14 +62,17 @@ export const homepageResolvers = {
         }
       }
 
-      // Hover images: update each by link_identifier
+      // Hover images: delete all, re-insert (same pattern as hero images)
       if (input.hoverImages) {
+        await pool.query('DELETE FROM about_hover_images')
         const images = input.hoverImages as Array<Record<string, unknown>>
         for (const img of images) {
-          await pool.query(
-            'UPDATE about_hover_images SET image_url = $1, alt_text = $2 WHERE link_identifier = $3',
-            [img.image_url, img.alt_text || '', img.link_identifier]
-          )
+          if (img.link_identifier && img.image_url) {
+            await pool.query(
+              'INSERT INTO about_hover_images (link_identifier, image_url, alt_text) VALUES ($1, $2, $3)',
+              [img.link_identifier, img.image_url, img.alt_text || '']
+            )
+          }
         }
       }
 
