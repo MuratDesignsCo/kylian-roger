@@ -10,14 +10,24 @@ export default async function PublicLayout({
 }: {
   children: React.ReactNode
 }) {
-  let footerBigName = 'KYLIAN ROGER'
   let copyrightText = '© 2026 KYLIAN ROGER'
+  let navbarLogoUrl = ''
+  let footerLogoUrl = ''
+  let navMenuOrder: string[] = ['home', 'works', 'contact']
+  let navDropdownOrder: string[] = ['photography', 'film-motion', 'art-direction']
 
   try {
     const data = await gqlRequest<{ settings: SiteSettings }>(SETTINGS_QUERY)
     if (data.settings) {
-      footerBigName = data.settings.footer_big_name || footerBigName
       copyrightText = data.settings.copyright_text || copyrightText
+      navbarLogoUrl = data.settings.navbar_logo_url || ''
+      footerLogoUrl = data.settings.footer_logo_url || ''
+      if (Array.isArray(data.settings.nav_menu_order) && data.settings.nav_menu_order.length > 0) {
+        navMenuOrder = data.settings.nav_menu_order
+      }
+      if (Array.isArray(data.settings.nav_dropdown_order) && data.settings.nav_dropdown_order.length > 0) {
+        navDropdownOrder = data.settings.nav_dropdown_order
+      }
     }
   } catch {
     // fallback to defaults
@@ -26,11 +36,17 @@ export default async function PublicLayout({
   return (
     <LenisProvider>
       <div className="page-wrapper">
-        <Navbar />
+        <Navbar
+          logoUrl={navbarLogoUrl}
+          menuOrder={navMenuOrder}
+          dropdownOrder={navDropdownOrder}
+        />
         <main className="main-wrapper">{children}</main>
         <Footer
-          bigName={footerBigName}
           copyright={copyrightText}
+          footerLogoUrl={footerLogoUrl}
+          menuOrder={navMenuOrder}
+          dropdownOrder={navDropdownOrder}
         />
       </div>
     </LenisProvider>

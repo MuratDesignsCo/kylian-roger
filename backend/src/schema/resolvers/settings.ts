@@ -19,15 +19,16 @@ export const settingsResolvers = {
         return rows[0]
       }
 
+      const jsonbFields = ['works_section_links', 'nav_menu_order', 'nav_dropdown_order']
       const setClauses = fields.map((f, i) => {
-        if (f === 'works_section_links') {
+        if (jsonbFields.includes(f)) {
           return `${f} = $${i + 1}::jsonb`
         }
         return `${f} = $${i + 1}`
       })
       const values = fields.map(f => {
         const val = input[f]
-        if (f === 'works_section_links') return JSON.stringify(val)
+        if (jsonbFields.includes(f)) return JSON.stringify(val)
         return val
       })
 

@@ -23,6 +23,7 @@ const webpImages = [
 
 const base: Omit<Project, 'id' | 'slug' | 'category' | 'title' | 'cover_image_url' | 'cover_image_alt' | 'year' | 'sort_order'> = {
   is_published: true,
+  project_date: null,
   created_at: '',
   updated_at: '',
   photo_subcategory: null,
@@ -37,22 +38,21 @@ const base: Omit<Project, 'id' | 'slug' | 'category' | 'title' | 'cover_image_ur
   art_tags: null,
   art_hero_label: null,
   card_label: null,
+  meta_title: '',
+  meta_description: '',
+  og_title: '',
+  og_description: '',
+  og_image_url: '',
 }
 
-// ─── Photography (20 projects, matching original HTML) ───
-const photoYears = [2026, 2025, 2025, 2025, 2025, 2024, 2024, 2024, 2024, 2024, 2024, 2023, 2023, 2023, 2023, 2023, 2022, 2022, 2022, 2022]
+// ─── Photography (5 projects) ───
+const photoYears = [2025, 2025, 2025, 2025, 2025]
 const photoLocations = [
   'Paris, France', 'Los Angeles, USA', 'Tokyo, Japan', 'London, UK', 'Berlin, Germany',
-  'New York, USA', 'Milan, Italy', 'Barcelona, Spain', 'Seoul, South Korea', 'Amsterdam, Netherlands',
-  'Sydney, Australia', 'Lisbon, Portugal', 'Montreal, Canada', 'Cape Town, South Africa', 'Copenhagen, Denmark',
-  'Mexico City, Mexico', 'Vienna, Austria', 'Stockholm, Sweden', 'Dubai, UAE', 'Buenos Aires, Argentina',
 ]
 
 const photoCardLabels = [
   'Ft. Studio Harcourt', 'Ft. Post-Office', null, 'Ft. Mikros Image', null,
-  'Ft. Digital District', null, null, 'Ft. BUF', null,
-  null, 'Ft. Mac Guff', null, null, null,
-  null, null, null, null, null,
 ]
 
 export const fallbackPhotoProjects: Project[] = photoYears.map((year, i) => ({
@@ -115,33 +115,13 @@ export const fallbackFilmProjects: Project[] = filmData.map((d, i) => ({
   film_layout: d.layout,
 }))
 
-// ─── Art Direction (25 projects, matching original HTML) ───
+// ─── Art Direction (5 projects) ───
 const artData = [
-  { title: 'ECLIPSE URBAINE', slug: 'eclipse-urbaine', year: 2026, client: 'Maison Eclipse', role: 'Direction artistique, Conception visuelle', desc: 'Direction artistique complète pour une campagne de mode urbaine.', tags: ['Campagne', 'Mode'] },
+  { title: 'ECLIPSE URBAINE', slug: 'eclipse-urbaine', year: 2025, client: 'Maison Eclipse', role: 'Direction artistique, Conception visuelle', desc: 'Direction artistique complète pour une campagne de mode urbaine.', tags: ['Campagne', 'Mode'] },
   { title: 'MAISON VERNE', slug: 'maison-verne', year: 2025, client: 'Editions Verne & Fils', role: 'Identité visuelle, Direction artistique', desc: "Identité visuelle et direction artistique pour une maison d'édition.", tags: ['Branding', 'Edition'] },
-  { title: 'NOIR MINERAL', slug: 'noir-mineral', year: 2025, client: 'Noir Cosmetics', role: 'Direction photo, Packaging', desc: 'Série photographique pour une marque de cosmétiques haut de gamme.', tags: ['Cosmétiques', 'Packaging'] },
   { title: 'SOLSTICE', slug: 'solstice', year: 2025, client: 'Festival Solstice', role: 'Direction artistique, Scénographie', desc: "Direction artistique d'un festival de musique électronique.", tags: ['Festival', 'Evénementiel'] },
+  { title: 'NOIR MINERAL', slug: 'noir-mineral', year: 2025, client: 'Noir Cosmetics', role: 'Direction photo, Packaging', desc: 'Série photographique pour une marque de cosmétiques haut de gamme.', tags: ['Cosmétiques', 'Packaging'] },
   { title: 'ATELIER CERAMIQUE', slug: 'atelier-ceramique', year: 2024, client: 'Atelier Terre & Feu', role: 'Direction éditoriale, Photographie', desc: 'Projet éditorial pour un artisan céramiste.', tags: ['Editorial', 'Artisanat'] },
-  { title: 'TRANSIT', slug: 'transit', year: 2024, client: 'Maison Nomade', role: 'Direction de campagne, Stylisme', desc: 'Campagne publicitaire pour une marque de bagagerie premium.', tags: ['Publicité', 'Luxe'] },
-  { title: 'HERBIER MODERNE', slug: 'herbier-moderne', year: 2024, client: 'Les Jardins de Théa', role: 'Branding, Direction artistique', desc: 'Direction artistique pour une marque de thé biologique.', tags: ['Branding', 'Alimentaire'] },
-  { title: 'BETON BRUT', slug: 'beton-brut', year: 2024, client: 'Cabinet Duval & Associés', role: 'Direction éditoriale, Photographie', desc: "Livre d'architecture pour un cabinet d'architectes brutalistes.", tags: ['Architecture', 'Editorial'] },
-  { title: 'DIALOGUE', slug: 'dialogue', year: 2023, client: 'Galerie Saint-Martin', role: 'Scénographie, Communication visuelle', desc: "Direction artistique d'une exposition d'art contemporain.", tags: ['Exposition', 'Art'] },
-  { title: 'NOCTAMBULE', slug: 'noctambule', year: 2023, client: 'Le Noctambule Paris', role: 'Identité graphique, Direction photo', desc: 'Campagne visuelle pour un bar à cocktails haut de gamme.', tags: ['Restauration', 'Identité'] },
-  { title: 'FILATURE', slug: 'filature', year: 2023, client: 'Atelier Haute Couture Leroy', role: 'Direction artistique, Lookbook', desc: 'Direction artistique pour une maison de haute couture.', tags: ['Mode', 'Lookbook'] },
-  { title: 'CARTOGRAPHIE SENSIBLE', slug: 'cartographie-sensible', year: 2023, client: 'Projet personnel', role: 'Conception, Installation interactive', desc: 'Projet artistique mêlant photographie et cartographie.', tags: ['Installation', 'Personnel'] },
-  { title: 'GRAIN DE PEAU', slug: 'grain-de-peau', year: 2022, client: 'Revue Peau Neuve', role: 'Direction éditoriale, Photographie', desc: 'Série éditoriale pour un magazine de beauté indépendant.', tags: ['Editorial', 'Beauté'] },
-  { title: 'PREMIER REGARD', slug: 'premier-regard', year: 2022, client: 'Optique Regard', role: 'Concept créatif, Déploiement 360', desc: "Direction artistique pour le lancement d'une marque de lunettes.", tags: ['Lancement', 'Eco-design'] },
-  { title: 'SILENCE SONORE', slug: 'silence-sonore', year: 2022, client: 'Label Onde Calme', role: 'Branding, Direction artistique', desc: 'Direction artistique pour un label de musique ambient.', tags: ['Musique', 'Branding'] },
-  { title: 'MATIERE PREMIERE', slug: 'matiere-premiere', year: 2022, client: 'Fondation Matière', role: 'Direction artistique, Catalogue', desc: 'Catalogue pour une exposition collective sur les matériaux bruts.', tags: ['Catalogue', 'Art'] },
-  { title: 'VERTIGO', slug: 'vertigo', year: 2021, client: 'Vertigo Parfums', role: 'Direction de campagne, Stylisme', desc: "Lancement d'un parfum de niche.", tags: ['Parfum', 'Campagne'] },
-  { title: 'LUMEN', slug: 'lumen', year: 2021, client: 'Studio Lumen', role: 'Identité visuelle, Site web', desc: 'Identité visuelle pour un studio de design luminaire.', tags: ['Design', 'Branding'] },
-  { title: 'PASSAGE COUVERT', slug: 'passage-couvert', year: 2021, client: 'Ville de Paris', role: 'Direction artistique, Signalétique', desc: 'Valorisation des passages couverts parisiens.', tags: ['Patrimoine', 'Institutionnel'] },
-  { title: 'ENCRE VIVE', slug: 'encre-vive', year: 2021, client: 'Encre Vive Tattoo', role: 'Branding, Direction photo', desc: 'Identité de marque pour un salon de tatouage haut de gamme.', tags: ['Tattoo', 'Identité'] },
-  { title: 'RESONANCE', slug: 'resonance', year: 2020, client: 'Orchestre de Chambre de Lyon', role: 'Direction artistique, Programme', desc: "Direction artistique d'une saison culturelle.", tags: ['Culture', 'Musique'] },
-  { title: 'HORS CADRE', slug: 'hors-cadre', year: 2020, client: 'Galerie Hors Cadre', role: 'Identité, Scénographie', desc: "Identité visuelle d'une galerie d'art contemporain.", tags: ['Galerie', 'Scénographie'] },
-  { title: 'TERROIR', slug: 'terroir', year: 2020, client: 'Domaine de la Roche', role: 'Direction photo, Packaging', desc: 'Direction artistique pour un domaine viticole biodynamique.', tags: ['Vin', 'Packaging'] },
-  { title: 'MOUVEMENT PERPETUEL', slug: 'mouvement-perpetuel', year: 2020, client: 'Compagnie Danse Éphémère', role: 'Direction artistique, Affiche', desc: 'Campagne visuelle pour une compagnie de danse contemporaine.', tags: ['Danse', 'Spectacle'] },
-  { title: 'AUBE', slug: 'aube', year: 2019, client: 'Projet personnel', role: "Photographie, Livre d'artiste", desc: "Livre d'artiste documentant les premières lueurs du jour.", tags: ['Personnel', 'Edition'] },
 ]
 
 export const fallbackArtProjects: Project[] = artData.map((d, i) => ({

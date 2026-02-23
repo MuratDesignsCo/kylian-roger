@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -8,24 +8,29 @@ import type { Project } from '@/lib/types'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const VISIBLE_COUNT = 9
 const BATCH_SIZE = 3
 
 interface PhotoGalleryProps {
   projects: Project[]
+  initialVisible?: number
 }
 
-export default function PhotoGallery({ projects }: PhotoGalleryProps) {
-  const [visibleCount, setVisibleCount] = useState(VISIBLE_COUNT)
+export default function PhotoGallery({ projects, initialVisible = 9 }: PhotoGalleryProps) {
+  const [visibleCount, setVisibleCount] = useState(initialVisible)
   const galleryRef = useRef<HTMLDivElement>(null)
   const animatedRef = useRef<Set<number>>(new Set())
   const gsapCtxRef = useRef<ReturnType<typeof gsap.context> | null>(null)
 
-  // Create and cleanup gsap context
+  // Create gsap context
   useEffect(() => {
     gsapCtxRef.current = gsap.context(() => {}, galleryRef)
+  }, [])
+
+  // Synchronous cleanup before DOM removal
+  useLayoutEffect(() => {
     return () => {
       gsapCtxRef.current?.revert()
+      gsapCtxRef.current = null
     }
   }, [])
 
@@ -54,7 +59,7 @@ export default function PhotoGallery({ projects }: PhotoGalleryProps) {
 
     const timer = setTimeout(() => {
       const items = Array.from(gallery.querySelectorAll<HTMLElement>('.photo-gallery_item'))
-      const toAnimate = items.filter((_, i) => i < VISIBLE_COUNT && !animatedRef.current.has(i))
+      const toAnimate = items.filter((_, i) => i < initialVisible && !animatedRef.current.has(i))
       toAnimate.forEach((_, i) => animatedRef.current.add(i))
       animateItems(toAnimate)
     }, 100)
@@ -100,6 +105,9 @@ export default function PhotoGallery({ projects }: PhotoGalleryProps) {
       handlers.forEach(({ el, enter, leave }) => {
         el.removeEventListener('mouseenter', enter)
         el.removeEventListener('mouseleave', leave)
+        // Kill any in-flight hover tweens on the image
+        const img = el.querySelector<HTMLElement>('.photo-gallery_image')
+        if (img) gsap.killTweensOf(img)
       })
     }
   }, [visibleCount, projects])

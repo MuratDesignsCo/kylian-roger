@@ -1,30 +1,35 @@
 'use client'
 
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useRef, useCallback, useEffect, useLayoutEffect } from 'react'
 import Link from 'next/link'
 import gsap from 'gsap'
 import type { Project } from '@/lib/types'
 
-const INITIAL_VISIBLE = 6
 const LOAD_MORE_COUNT = 3
 
 interface ArtDirectionListProps {
   projects: Project[]
+  initialVisible?: number
 }
 
-export default function ArtDirectionList({ projects }: ArtDirectionListProps) {
-  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE)
+export default function ArtDirectionList({ projects, initialVisible = 6 }: ArtDirectionListProps) {
+  const [visibleCount, setVisibleCount] = useState(initialVisible)
   const [currentView, setCurrentView] = useState<'list' | 'grid'>('list')
   const [switching, setSwitching] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
   const gsapCtxRef = useRef<ReturnType<typeof gsap.context> | null>(null)
 
-  // Create and cleanup gsap context to prevent removeChild errors
+  // Create gsap context
   useEffect(() => {
     gsapCtxRef.current = gsap.context(() => {}, containerRef)
+  }, [])
+
+  // Synchronous cleanup before DOM removal to prevent removeChild errors
+  useLayoutEffect(() => {
     return () => {
       gsapCtxRef.current?.revert()
+      gsapCtxRef.current = null
     }
   }, [])
 
@@ -177,7 +182,7 @@ export default function ArtDirectionList({ projects }: ArtDirectionListProps) {
               >
                 <div className="art-item_info">
                   <span className="art-item_number">{number}</span>
-                  <h3 className="art-item_title">{project.title}</h3>
+                  <h2 className="art-item_title">{project.title}</h2>
                   <div className="art-item_details">
                     {project.art_client && (
                       <div className="art-item_detail-row">
@@ -195,6 +200,12 @@ export default function ArtDirectionList({ projects }: ArtDirectionListProps) {
                       <span className="art-item_label">Ann&#233;e</span>
                       <span className="art-item_value">{project.year}</span>
                     </div>
+                    {project.card_label && (
+                      <div className="art-item_detail-row">
+                        <span className="art-item_label">Featuring</span>
+                        <span className="art-item_value">{project.card_label}</span>
+                      </div>
+                    )}
                   </div>
                   {project.art_description && (
                     <p className="art-item_description">{project.art_description}</p>
@@ -215,14 +226,14 @@ export default function ArtDirectionList({ projects }: ArtDirectionListProps) {
                     {'VOIR LE PROJET \u2192'}
                   </Link>
                 </div>
-                <div className="art-item_image-wrapper">
+                <Link href={`/works/${project.slug}`} className="art-item_image-wrapper">
                   <img
                     src={project.cover_image_url || '/images/blank.jpg'}
                     loading="lazy"
                     alt={project.cover_image_alt || project.title}
                     className="art-item_image"
                   />
-                </div>
+                </Link>
               </div>
             )
           })}

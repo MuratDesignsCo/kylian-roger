@@ -21,7 +21,7 @@ export const projectsResolvers = {
       if (conditions.length > 0) {
         query += ' WHERE ' + conditions.join(' AND ')
       }
-      query += ' ORDER BY sort_order ASC, created_at DESC'
+      query += ' ORDER BY project_date DESC NULLS LAST, year DESC, created_at DESC'
 
       const { rows } = await pool.query(query, values)
       return rows
@@ -39,6 +39,13 @@ export const projectsResolvers = {
   },
 
   Project: {
+    // Format DATE as "YYYY-MM-DD" string (pg driver returns Date objects)
+    project_date: (parent: { project_date: Date | null }) => {
+      if (!parent.project_date) return null
+      const d = new Date(parent.project_date)
+      return d.toISOString().split('T')[0]
+    },
+
     gallery_rows: async (parent: { id: string }) => {
       const { rows } = await pool.query(
         'SELECT * FROM project_gallery_rows WHERE project_id = $1 ORDER BY sort_order',
@@ -88,13 +95,19 @@ export const projectsResolvers = {
     createProject: async (_: unknown, { input }: { input: Record<string, unknown> }, context: GqlContext) => {
       requireAuth(context)
 
+      // Auto-compute year from project_date if provided
+      if (input.project_date && !input.year) {
+        input.year = new Date(input.project_date as string).getFullYear()
+      }
+
       const fields = [
         'slug', 'category', 'title', 'cover_image_url', 'cover_image_alt',
-        'year', 'sort_order', 'is_published',
+        'year', 'project_date', 'sort_order', 'is_published',
         'photo_subcategory', 'photo_location',
         'film_video_url', 'film_bg_image_url', 'film_subtitle', 'film_layout',
         'art_client', 'art_role', 'art_description', 'art_tags', 'art_hero_label',
         'card_label',
+        'meta_title', 'meta_description', 'og_title', 'og_description', 'og_image_url',
       ]
       const presentFields = fields.filter(f => input[f] !== undefined)
       const placeholders = presentFields.map((_, i) => `$${i + 1}`)
@@ -109,6 +122,11 @@ export const projectsResolvers = {
 
     updateProject: async (_: unknown, { id, input }: { id: string; input: Record<string, unknown> }, context: GqlContext) => {
       requireAuth(context)
+
+      // Auto-compute year from project_date if provided
+      if (input.project_date) {
+        input.year = new Date(input.project_date as string).getFullYear()
+      }
 
       const fields = Object.keys(input).filter(k => input[k] !== undefined)
       if (fields.length === 0) {

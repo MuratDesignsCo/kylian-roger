@@ -25,8 +25,15 @@ export const UPDATE_SETTINGS_MUTATION = `
       about_text_html
       works_section_title
       works_section_links
+      works_section_subtitle
+      hero_logo_top_url
+      hero_logo_bottom_url
       footer_big_name
       copyright_text
+      navbar_logo_url
+      footer_logo_url
+      nav_menu_order
+      nav_dropdown_order
     }
   }
 `
@@ -41,6 +48,18 @@ export const UPSERT_SEO_PAGES_MUTATION = `
       og_title
       og_description
       og_image_url
+    }
+  }
+`
+
+export const UPSERT_PAGE_SETTINGS_MUTATION = `
+  mutation UpsertPageSettings($input: PageSettingsInput!) {
+    upsertPageSettings(input: $input) {
+      page_slug
+      page_title
+      items_per_page
+      items_per_page_alt
+      updated_at
     }
   }
 `
@@ -66,6 +85,7 @@ export const UPDATE_PROJECT_MUTATION = `
       cover_image_url
       cover_image_alt
       year
+      project_date
       sort_order
       is_published
     }
@@ -181,6 +201,12 @@ export const UPDATE_CONTACT_MUTATION = `
         id
         image_url
         alt_text
+        sort_order
+      }
+      mediaKitButtons {
+        id
+        label
+        file_url
         sort_order
       }
     }

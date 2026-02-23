@@ -1,4 +1,5 @@
 import { getFilmMotionProjects } from '@/lib/data/film-motion'
+import { getPageSettings } from '@/lib/data/page-settings'
 import { getPageSeo, seoToMetadata } from '@/lib/data/seo'
 import { fallbackFilmProjects } from '@/lib/data/fallback-projects'
 import type { Metadata } from 'next'
@@ -11,8 +12,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function FilmMotionPage() {
-  const projects = await getFilmMotionProjects()
+  const [projects, settings] = await Promise.all([
+    getFilmMotionProjects(),
+    getPageSettings('film-motion'),
+  ])
   const resolved = projects.length > 0 ? projects : fallbackFilmProjects
+  const pageTitle = settings?.page_title || 'FILM / MOTION'
 
   return (
     <>
@@ -20,7 +25,7 @@ export default async function FilmMotionPage() {
         <div className="padding-global">
           <div className="works_list-heading">
             <div className="works_list-headline">
-              <AnimatedHeadline className="text-align-center">FILM / MOTION</AnimatedHeadline>
+              <AnimatedHeadline className="text-align-center">{pageTitle}</AnimatedHeadline>
             </div>
           </div>
         </div>

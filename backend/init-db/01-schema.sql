@@ -28,6 +28,13 @@ CREATE TABLE site_settings (
   works_section_links JSONB NOT NULL DEFAULT '[{"label":"STILL","href":"photography.html"},{"label":"MOTION","href":"film-motion.html"}]'::jsonb,
   footer_big_name TEXT NOT NULL DEFAULT 'KYLIAN ROGER',
   copyright_text TEXT NOT NULL DEFAULT '© 2026 KYLIAN ROGER',
+  navbar_logo_url TEXT NOT NULL DEFAULT '',
+  footer_logo_url TEXT NOT NULL DEFAULT '',
+  nav_menu_order JSONB NOT NULL DEFAULT '["home", "works", "contact"]'::jsonb,
+  nav_dropdown_order JSONB NOT NULL DEFAULT '["photography", "film-motion", "art-direction"]'::jsonb,
+  works_section_subtitle TEXT NOT NULL DEFAULT 'Explore more',
+  hero_logo_top_url TEXT NOT NULL DEFAULT '',
+  hero_logo_bottom_url TEXT NOT NULL DEFAULT '',
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
@@ -47,12 +54,28 @@ CREATE TABLE pages_seo (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-INSERT INTO pages_seo (page_slug, meta_title, meta_description) VALUES
-  ('home', 'Kylian Roger — Photographe, Réalisateur & Directeur Artistique', 'Portfolio de Kylian Roger, artiste multidisciplinaire.'),
-  ('photography', 'Photographie — Kylian Roger | Portfolio', 'Découvrez les projets photographiques de Kylian Roger.'),
-  ('film-motion', 'Film / Motion — Kylian Roger | Portfolio', 'Découvrez les projets film et motion de Kylian Roger.'),
-  ('art-direction', 'Art Direction — Kylian Roger | Portfolio', 'Découvrez les projets de direction artistique de Kylian Roger.'),
-  ('contact', 'Contact — Kylian Roger | Photographe & Directeur Artistique', 'Contactez Kylian Roger pour vos projets.');
+INSERT INTO pages_seo (page_slug, meta_title, meta_description, og_title, og_description) VALUES
+  ('home', 'Kylian Roger — Photographe, Réalisateur & Directeur Artistique', 'Portfolio de Kylian Roger, artiste multidisciplinaire. Photographie, réalisation et direction artistique pour l''automobile, le sport, le lifestyle et des projets éditoriaux.', 'Kylian Roger — Portfolio', 'Photographe, réalisateur et directeur artistique. Découvrez le portfolio de Kylian Roger.'),
+  ('photography', 'Photographie — Kylian Roger | Portfolio', 'Découvrez les projets photographiques de Kylian Roger : automobile, sport, mode, lifestyle et éditorial. Un regard unique entre lumière et mouvement.', 'Photographie — Kylian Roger', 'Projets photographiques de Kylian Roger : automobile, sport, mode, lifestyle et éditorial.'),
+  ('film-motion', 'Film / Motion — Kylian Roger | Portfolio', 'Projets vidéo et motion design de Kylian Roger : films publicitaires, clips, contenus automobile et sport. Réalisation et direction artistique.', 'Film / Motion — Kylian Roger', 'Films publicitaires, clips et motion design par Kylian Roger.'),
+  ('art-direction', 'Direction Artistique — Kylian Roger | Portfolio', 'Projets de direction artistique par Kylian Roger : campagnes mode, branding, identité visuelle, scénographie et éditorial.', 'Direction Artistique — Kylian Roger', 'Direction artistique par Kylian Roger : campagnes mode, branding, identité visuelle et scénographie.'),
+  ('contact', 'Contact — Kylian Roger | Photographe & Directeur Artistique', 'Contactez Kylian Roger pour vos projets photo, film ou direction artistique. Disponible en France et à l''international.', 'Contact — Kylian Roger', 'Contactez Kylian Roger pour vos projets photo, film ou direction artistique.');
+
+-- ============================================================
+-- 2b. PAGE SETTINGS (per-page config: title, pagination)
+-- ============================================================
+CREATE TABLE page_settings (
+  page_slug TEXT PRIMARY KEY,
+  page_title TEXT,
+  items_per_page INTEGER DEFAULT 9,
+  items_per_page_alt INTEGER,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+INSERT INTO page_settings (page_slug, page_title, items_per_page, items_per_page_alt) VALUES
+  ('photography', 'PHOTOGRAPHY', 9, NULL),
+  ('film-motion', 'FILM / MOTION', NULL, NULL),
+  ('art-direction', 'ART DIRECTION', 6, 6);
 
 -- ============================================================
 -- 3. HERO IMAGES
@@ -75,7 +98,7 @@ CREATE TABLE about_hover_images (
 );
 
 INSERT INTO about_hover_images (link_identifier) VALUES
-  ('photography'), ('directing'), ('art-direction');
+  ('/photography'), ('/film-motion'), ('/art-direction');
 
 -- ============================================================
 -- 5. PROJECTS
@@ -88,6 +111,7 @@ CREATE TABLE projects (
   cover_image_url TEXT NOT NULL DEFAULT '',
   cover_image_alt TEXT NOT NULL DEFAULT '',
   year INT NOT NULL DEFAULT 2026,
+  project_date DATE,
   sort_order INT NOT NULL DEFAULT 0,
   is_published BOOLEAN NOT NULL DEFAULT false,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -107,7 +131,13 @@ CREATE TABLE projects (
   art_tags TEXT[] DEFAULT '{}',
   art_hero_label TEXT,
   -- Card display label
-  card_label TEXT
+  card_label TEXT,
+  -- SEO fields (per-project meta for /works/[slug] pages)
+  meta_title TEXT NOT NULL DEFAULT '',
+  meta_description TEXT NOT NULL DEFAULT '',
+  og_title TEXT NOT NULL DEFAULT '',
+  og_description TEXT NOT NULL DEFAULT '',
+  og_image_url TEXT NOT NULL DEFAULT ''
 );
 
 CREATE INDEX idx_projects_category ON projects (category, sort_order);
@@ -279,4 +309,8 @@ CREATE TRIGGER tr_projects_updated
 
 CREATE TRIGGER tr_contact_page_updated
   BEFORE UPDATE ON contact_page
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+CREATE TRIGGER tr_page_settings_updated
+  BEFORE UPDATE ON page_settings
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();

@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { Upload, X, Loader2 } from 'lucide-react'
 import { getAuthToken } from '@/components/admin/AuthGuard'
+import { UPLOAD_URL } from '@/lib/graphql/client'
 
 interface ImageItem {
   image_url: string
@@ -67,7 +68,7 @@ export default function MultiImageUpload({
           formData.append('file', filesToUpload[i])
 
           const token = getAuthToken()
-          const res = await fetch(process.env.NEXT_PUBLIC_UPLOAD_URL || '/api/upload', {
+          const res = await fetch(UPLOAD_URL, {
             method: 'POST',
             headers: token ? { 'Authorization': `Bearer ${token}` } : {},
             body: formData,
@@ -134,7 +135,7 @@ export default function MultiImageUpload({
   return (
     <div className="space-y-3">
       {label && (
-        <label className="block text-sm font-medium text-zinc-300">
+        <label className="block text-sm font-medium text-gray-700">
           {label}
         </label>
       )}
@@ -146,26 +147,26 @@ export default function MultiImageUpload({
           className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed px-6 py-6 transition-colors ${
             isDragActive
               ? 'border-blue-500 bg-blue-500/10'
-              : 'border-zinc-700 bg-zinc-800 hover:border-zinc-500'
+              : 'border-gray-300 bg-gray-50 hover:border-gray-400'
           } ${uploading ? 'pointer-events-none opacity-50' : ''}`}
         >
           <input {...getInputProps()} />
           {uploading ? (
             <>
-              <Loader2 className="mb-2 h-6 w-6 animate-spin text-zinc-400" />
-              <p className="text-sm text-zinc-400">
+              <Loader2 className="mb-2 h-6 w-6 animate-spin text-gray-500" />
+              <p className="text-sm text-gray-500">
                 Uploading {progress.current}/{progress.total}...
               </p>
             </>
           ) : (
             <>
-              <Upload className="mb-2 h-6 w-6 text-zinc-400" />
-              <p className="text-sm text-zinc-400">
+              <Upload className="mb-2 h-6 w-6 text-gray-500" />
+              <p className="text-sm text-gray-500">
                 {isDragActive
                   ? 'Drop images here'
                   : 'Drag & drop or click to upload images'}
               </p>
-              <p className="mt-1 text-xs text-zinc-500">
+              <p className="mt-1 text-xs text-gray-400">
                 Max 5MB per image
                 {maxImages && ` \u00B7 ${images.length}/${maxImages}`}
               </p>
@@ -174,14 +175,14 @@ export default function MultiImageUpload({
         </div>
       )}
 
-      {error && <p className="text-sm text-red-400">{error}</p>}
+      {error && <p className="text-sm text-red-500">{error}</p>}
 
       {/* Image grid */}
       {images.length > 0 && (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {images.map((img, index) => (
             <div key={`${img.image_url}-${index}`} className="space-y-1.5">
-              <div className="group relative aspect-square overflow-hidden rounded-lg border border-zinc-700 bg-zinc-800">
+              <div className="group relative aspect-square overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
                 <img
                   src={img.image_url}
                   alt={img.alt_text || `Image ${index + 1}`}
@@ -190,7 +191,7 @@ export default function MultiImageUpload({
                 <button
                   type="button"
                   onClick={() => handleRemove(index)}
-                  className="absolute top-1.5 right-1.5 rounded-full bg-zinc-900/80 p-1 text-zinc-400 opacity-0 transition-opacity hover:bg-zinc-900 hover:text-white group-hover:opacity-100"
+                  className="absolute top-1.5 right-1.5 rounded-full bg-white/90 p-1 text-gray-500 shadow-sm opacity-0 transition-opacity hover:bg-white hover:text-gray-900 group-hover:opacity-100"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
@@ -200,7 +201,7 @@ export default function MultiImageUpload({
                 value={img.alt_text}
                 onChange={(e) => handleAltTextChange(index, e.target.value)}
                 placeholder="Alt text"
-                className="w-full rounded border border-zinc-700 bg-zinc-800 px-2 py-1 text-xs text-zinc-200 placeholder-zinc-500 focus:border-zinc-500 focus:outline-none"
+                className="w-full rounded border border-gray-300 bg-gray-50 px-2 py-1 text-xs text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none"
               />
             </div>
           ))}

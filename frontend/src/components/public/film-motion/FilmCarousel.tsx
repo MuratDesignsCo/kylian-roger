@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, useCallback } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useLenisContext } from '@/components/public/LenisProvider'
@@ -42,6 +42,16 @@ export default function FilmCarousel({ projects }: FilmCarouselProps) {
     globalVolume: 1,
     globalMuted: false,
   })
+  const gsapCtxRef = useRef<ReturnType<typeof gsap.context> | null>(null)
+
+  // Synchronous cleanup BEFORE React removes DOM nodes —
+  // critical because ScrollTrigger pin moves elements into a pin-spacer wrapper
+  useLayoutEffect(() => {
+    return () => {
+      gsapCtxRef.current?.revert()
+      gsapCtxRef.current = null
+    }
+  }, [projects, lenis])
 
   useEffect(() => {
     const gallery = galleryRef.current
@@ -60,51 +70,61 @@ export default function FilmCarousel({ projects }: FilmCarouselProps) {
     const WHEEL_COOLDOWN = 60
     const TOUCH_THRESHOLD = 30
 
-    // Layout setup
-    gsap.set(gallery, {
-      position: 'relative',
-      overflow: 'hidden',
-      height: '100vh',
-      width: '100vw',
-      marginLeft: 'calc(-50vw + 50%)',
-    })
+    // GSAP context scoped to gallery — revert() kills all tweens/ScrollTriggers
+    const ctx = gsap.context(() => {}, gallery)
+    gsapCtxRef.current = ctx
 
-    items.forEach((item, i) => {
-      gsap.set(item, {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        yPercent: i === 0 ? 0 : 100,
-        zIndex: i === 0 ? 2 : 1,
+    // Layout setup (inside context so revert() cleans inline styles)
+    ctx.add(() => {
+      gsap.set(gallery, {
+        position: 'relative',
+        overflow: 'hidden',
+        height: '100vh',
+        width: '100vw',
+        marginLeft: 'calc(-50vw + 50%)',
       })
-      const content = item.querySelector('.film-gallery_content')
-      const bgImg = item.querySelector('.film-gallery_bg-img') || item.querySelector('.film-gallery_split-photo-img')
-      if (content) gsap.set(content, { opacity: 0, y: 50 })
-      if (bgImg) gsap.set(bgImg, { scale: 1.1 })
+
+      items.forEach((item, i) => {
+        gsap.set(item, {
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          yPercent: i === 0 ? 0 : 100,
+          zIndex: i === 0 ? 2 : 1,
+        })
+        const content = item.querySelector('.film-gallery_content')
+        const bgImg = item.querySelector('.film-gallery_bg-img') || item.querySelector('.film-gallery_split-photo-img')
+        if (content) gsap.set(content, { opacity: 0, y: 50 })
+        if (bgImg) gsap.set(bgImg, { scale: 1.1 })
+      })
     })
 
     // Animate first panel
-    requestAnimationFrame(() => {
-      const firstContent = items[0].querySelector('.film-gallery_content')
-      const firstBg = items[0].querySelector('.film-gallery_bg-img') || items[0].querySelector('.film-gallery_split-photo-img')
-      if (firstContent) {
-        gsap.to(firstContent, {
-          opacity: 1, y: 0,
-          duration: CONTENT_FADE_DURATION,
-          ease: 'power3.out',
-          delay: 0.4,
-        })
-      }
-      if (firstBg) {
-        gsap.to(firstBg, {
-          scale: 1,
-          duration: BG_ZOOM_DURATION,
-          ease: 'power2.out',
-          delay: 0.2,
-        })
-      }
+    let rafId: number | null = null
+    rafId = requestAnimationFrame(() => {
+      rafId = null
+      ctx.add(() => {
+        const firstContent = items[0].querySelector('.film-gallery_content')
+        const firstBg = items[0].querySelector('.film-gallery_bg-img') || items[0].querySelector('.film-gallery_split-photo-img')
+        if (firstContent) {
+          gsap.to(firstContent, {
+            opacity: 1, y: 0,
+            duration: CONTENT_FADE_DURATION,
+            ease: 'power3.out',
+            delay: 0.4,
+          })
+        }
+        if (firstBg) {
+          gsap.to(firstBg, {
+            scale: 1,
+            duration: BG_ZOOM_DURATION,
+            ease: 'power2.out',
+            delay: 0.2,
+          })
+        }
+      })
     })
 
     // Panel transition
@@ -125,45 +145,50 @@ export default function FilmCarousel({ projects }: FilmCarouselProps) {
       const contentDur = fast ? 0.3 : CONTENT_FADE_DURATION
       const bgDur = fast ? 0.6 : BG_ZOOM_DURATION
 
-      gsap.set(newItem, { yPercent: direction * 100, zIndex: 3 })
-      const newContent = newItem.querySelector('.film-gallery_content')
-      const newBg = newItem.querySelector('.film-gallery_bg-img') || newItem.querySelector('.film-gallery_split-photo-img')
-      if (newContent) gsap.set(newContent, { opacity: 0, y: 50 })
-      if (newBg) gsap.set(newBg, { scale: 1.1 })
+      ctx.add(() => {
+        gsap.set(newItem, { yPercent: direction * 100, zIndex: 3 })
+        const newContent = newItem.querySelector('.film-gallery_content')
+        const newBg = newItem.querySelector('.film-gallery_bg-img') || newItem.querySelector('.film-gallery_split-photo-img')
+        if (newContent) gsap.set(newContent, { opacity: 0, y: 50 })
+        if (newBg) gsap.set(newBg, { scale: 1.1 })
 
-      const tl = gsap.timeline({
-        onComplete: () => {
-          gsap.set(oldItem, { zIndex: 1 })
-          gsap.set(newItem, { zIndex: 2 })
-          const oldContent = oldItem.querySelector('.film-gallery_content')
-          if (oldContent) gsap.set(oldContent, { opacity: 0 })
-          state.currentIndex = newIndex
-          state.isAnimating = false
-          updateBackTopBtn()
-        },
+        const tl = gsap.timeline({
+          onComplete: () => {
+            gsap.set(oldItem, { zIndex: 1 })
+            gsap.set(newItem, { zIndex: 2 })
+            const oldContent = oldItem.querySelector('.film-gallery_content')
+            if (oldContent) gsap.set(oldContent, { opacity: 0 })
+            state.currentIndex = newIndex
+            state.isAnimating = false
+            updateBackTopBtn()
+          },
+        })
+
+        tl.to(oldItem, { yPercent: -direction * 100, duration: slideDur, ease: SLIDE_EASE }, 0)
+        tl.to(newItem, { yPercent: 0, duration: slideDur, ease: SLIDE_EASE }, 0)
+        if (newContent) {
+          tl.to(newContent, { opacity: 1, y: 0, duration: contentDur, ease: 'power3.out' }, slideDur * 0.35)
+        }
+        if (newBg) {
+          tl.to(newBg, { scale: 1, duration: bgDur, ease: 'power2.out' }, 0.1)
+        }
       })
-
-      tl.to(oldItem, { yPercent: -direction * 100, duration: slideDur, ease: SLIDE_EASE }, 0)
-      tl.to(newItem, { yPercent: 0, duration: slideDur, ease: SLIDE_EASE }, 0)
-      if (newContent) {
-        tl.to(newContent, { opacity: 1, y: 0, duration: contentDur, ease: 'power3.out' }, slideDur * 0.35)
-      }
-      if (newBg) {
-        tl.to(newBg, { scale: 1, duration: bgDur, ease: 'power2.out' }, 0.1)
-      }
     }
 
-    // ScrollTrigger pin
-    const st = ScrollTrigger.create({
-      trigger: gallery,
-      start: 'top top',
-      end: () => '+=' + items.length * window.innerHeight,
-      pin: true,
-      pinSpacing: true,
-      onEnter: () => { state.galleryActive = true; lenis?.stop() },
-      onEnterBack: () => { state.galleryActive = true; lenis?.stop() },
-      onLeave: () => { state.galleryActive = false; if (!state.isFullscreen) lenis?.start(); updateBackTopBtn() },
-      onLeaveBack: () => { state.galleryActive = false; if (!state.isFullscreen) lenis?.start(); updateBackTopBtn() },
+    // ScrollTrigger pin (inside context for auto-cleanup)
+    let st: ScrollTrigger
+    ctx.add(() => {
+      st = ScrollTrigger.create({
+        trigger: gallery,
+        start: 'top top',
+        end: () => '+=' + items.length * window.innerHeight,
+        pin: true,
+        pinSpacing: true,
+        onEnter: () => { state.galleryActive = true; lenis?.stop() },
+        onEnterBack: () => { state.galleryActive = true; lenis?.stop() },
+        onLeave: () => { state.galleryActive = false; if (!state.isFullscreen) lenis?.start(); updateBackTopBtn() },
+        onLeaveBack: () => { state.galleryActive = false; if (!state.isFullscreen) lenis?.start(); updateBackTopBtn() },
+      })
     })
 
     // Wheel handler
@@ -217,19 +242,21 @@ export default function FilmCarousel({ projects }: FilmCarouselProps) {
     // Back to top
     function updateBackTopBtn() {
       if (!backTopBtn) return
-      if (state.currentIndex > 0 && state.galleryActive) {
-        backTopBtn.classList.add('is-visible')
-        backTopBtn.setAttribute('aria-hidden', 'false')
-        gsap.to(backTopBtn, { opacity: 1, duration: 0.3, ease: 'power2.out' })
-      } else {
-        gsap.to(backTopBtn, {
-          opacity: 0, duration: 0.3, ease: 'power2.in',
-          onComplete: () => {
-            backTopBtn.classList.remove('is-visible')
-            backTopBtn.setAttribute('aria-hidden', 'true')
-          },
-        })
-      }
+      ctx.add(() => {
+        if (state.currentIndex > 0 && state.galleryActive) {
+          backTopBtn.classList.add('is-visible')
+          backTopBtn.setAttribute('aria-hidden', 'false')
+          gsap.to(backTopBtn, { opacity: 1, duration: 0.3, ease: 'power2.out' })
+        } else {
+          gsap.to(backTopBtn, {
+            opacity: 0, duration: 0.3, ease: 'power2.in',
+            onComplete: () => {
+              backTopBtn.classList.remove('is-visible')
+              backTopBtn.setAttribute('aria-hidden', 'true')
+            },
+          })
+        }
+      })
     }
 
     const onBackTop = () => {
@@ -264,7 +291,6 @@ export default function FilmCarousel({ projects }: FilmCarouselProps) {
       const progressFill = item.querySelector<HTMLElement>('.film-gallery_progress-fill')
       const timeDisplay = item.querySelector<HTMLElement>('.film-gallery_time')
       const fsBtn = item.querySelector<HTMLButtonElement>('.film-gallery_fullscreen-btn')
-      const wrapper = item.querySelector<HTMLElement>('.film-gallery_player-wrapper')
       const muteBtn = item.querySelector<HTMLButtonElement>('.film-gallery_mute-btn')
       const volumeSlider = item.querySelector<HTMLInputElement>('.film-gallery_volume-slider')
       if (!video) return
@@ -291,7 +317,7 @@ export default function FilmCarousel({ projects }: FilmCarouselProps) {
       video.addEventListener('timeupdate', onTimeUpdate)
       video.addEventListener('loadedmetadata', onMeta)
 
-      // All clicks on inline player open fullscreen
+      // All inline clicks open fullscreen
       const openFs = (e: Event) => { e.stopPropagation(); openFullscreen(video) }
       playBtn?.addEventListener('click', openFs)
       progressBar?.addEventListener('click', openFs)
@@ -302,7 +328,6 @@ export default function FilmCarousel({ projects }: FilmCarouselProps) {
       }
       video.addEventListener('click', openFs)
       fsBtn?.addEventListener('click', openFs)
-      wrapper?.addEventListener('click', () => { openFullscreen(video) })
     })
 
     // Fullscreen overlay
@@ -311,6 +336,10 @@ export default function FilmCarousel({ projects }: FilmCarouselProps) {
 
     function openFullscreen(srcVideo: HTMLVideoElement) {
       if (!overlay || !fsVideo) return
+
+      // Kill any pending close animation to prevent its onComplete from firing
+      gsap.killTweensOf(overlay)
+
       state.isFullscreen = true
       state.sourceVideo = srcVideo
       if (!srcVideo.paused) srcVideo.pause()
@@ -327,7 +356,9 @@ export default function FilmCarousel({ projects }: FilmCarouselProps) {
 
       overlay.classList.add('is-active')
       overlay.setAttribute('aria-hidden', 'false')
-      gsap.fromTo(overlay, { opacity: 0 }, { opacity: 1, duration: 0.4, ease: 'power2.out' })
+      ctx.add(() => {
+        gsap.fromTo(overlay, { opacity: 0 }, { opacity: 1, duration: 0.4, ease: 'power2.out' })
+      })
 
       // Sync volume state
       fsVideo.volume = state.globalVolume
@@ -343,20 +374,35 @@ export default function FilmCarousel({ projects }: FilmCarouselProps) {
 
     function closeFullscreen() {
       if (!overlay || !fsVideo || !overlay.classList.contains('is-active')) return
+
+      // Set state immediately to avoid stale checks
+      state.isFullscreen = false
+
       if (state.sourceVideo && fsVideo.currentTime) {
         state.sourceVideo.currentTime = fsVideo.currentTime
       }
       fsVideo.pause()
-      gsap.to(overlay, {
-        opacity: 0, duration: 0.3, ease: 'power2.in',
-        onComplete: () => {
-          overlay.classList.remove('is-active')
-          overlay.setAttribute('aria-hidden', 'true')
-          fsVideo.removeAttribute('src')
-          fsVideo.load()
-          state.isFullscreen = false
-        },
+
+      // Kill any pending open/close animation
+      gsap.killTweensOf(overlay)
+
+      ctx.add(() => {
+        gsap.to(overlay, {
+          opacity: 0, duration: 0.3, ease: 'power2.in',
+          onComplete: () => {
+            // Guard: if fullscreen was reopened during this animation, do nothing
+            if (state.isFullscreen) return
+            overlay.classList.remove('is-active')
+            overlay.setAttribute('aria-hidden', 'true')
+            fsVideo.removeAttribute('src')
+            fsVideo.load()
+          },
+        })
       })
+
+      // Restart lenis if we're still in the gallery
+      if (state.galleryActive) lenis?.stop()
+      else lenis?.start()
     }
 
     const closeBtn = overlay?.querySelector('.film-gallery_close-btn')
@@ -428,16 +474,21 @@ export default function FilmCarousel({ projects }: FilmCarouselProps) {
     }
 
     return () => {
-      st.kill()
-      ScrollTrigger.getAll().filter((t) => {
-        const el = t.trigger
-        return el && gallery.contains(el as Node)
-      }).forEach((t) => t.kill())
+      // Cancel pending async callbacks
+      if (rafId) cancelAnimationFrame(rafId)
+      if (state.wheelTimer) {
+        clearTimeout(state.wheelTimer)
+        state.wheelTimer = null
+      }
+      // Note: ctx.revert() is handled by useLayoutEffect (runs before DOM removal)
+      // Remove global listeners
       window.removeEventListener('wheel', onWheel)
       window.removeEventListener('touchstart', onTouchStart)
       window.removeEventListener('touchmove', onTouchMove)
       document.removeEventListener('keydown', onEscape)
       backTopBtn?.removeEventListener('click', onBackTop)
+      // Ensure Lenis is restarted
+      lenis?.start()
     }
   }, [projects, lenis])
 

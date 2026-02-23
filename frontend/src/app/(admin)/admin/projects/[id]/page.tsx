@@ -15,7 +15,7 @@ export default function EditProjectPage({
   return (
     <AuthGuard>
       {(session) => (
-        <div className="flex h-screen bg-zinc-950">
+        <div className="flex h-screen bg-white">
           <AdminSidebar session={session} />
           <main className="flex-1 overflow-y-auto">
             <ProjectEditorPage id={id} />

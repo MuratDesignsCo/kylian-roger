@@ -1,6 +1,7 @@
 import { GraphQLScalarType, Kind } from 'graphql'
 import { settingsResolvers } from './settings.js'
 import { seoResolvers } from './seo.js'
+import { pageSettingsResolvers } from './page-settings.js'
 import { projectsResolvers } from './projects.js'
 import { homepageResolvers } from './homepage.js'
 import { contactResolvers } from './contact.js'
@@ -47,6 +48,7 @@ const resolvers = {
   ...mergeResolvers(
     settingsResolvers,
     seoResolvers,
+    pageSettingsResolvers,
     projectsResolvers,
     homepageResolvers,
     contactResolvers,

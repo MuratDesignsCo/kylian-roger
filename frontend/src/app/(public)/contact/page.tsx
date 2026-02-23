@@ -11,8 +11,7 @@ export async function generateMetadata(): Promise<Metadata> {
   if (seo) return seoToMetadata(seo, 'Contact — Kylian Roger')
   return {
     title: 'Contact — Kylian Roger',
-    description:
-      'Contactez Kylian Roger pour vos projets photo, film ou direction artistique.',
+    description: 'Contactez Kylian Roger pour vos projets photo, film ou direction artistique. Disponible en France et à l\'international.',
   }
 }
 
@@ -34,6 +33,10 @@ const defaultAwards: Award[] = [
   { id: 'default-a5', award_name: 'Finalist – Portrait Awards', organizer: 'LensCulture', year: '2021', hover_image_url: '/images/jay-soundo-T2sBYIswIhE-unsplash_1jay-soundo-T2sBYIswIhE-unsplash.webp', sort_order: 4 },
 ]
 
+const defaultMediaKitButtons: MediaKitButton[] = [
+  { id: 'default-mk1', label: 'Download Kit Média', file_url: '#', sort_order: 0 },
+]
+
 const defaultBtsImages: BtsImage[] = [
   { id: 'default-b1', image_url: '/images/jay-soundo-1ZQMIUYTp3c-unsplash_1jay-soundo-1ZQMIUYTp3c-unsplash.webp', alt_text: 'Behind the scenes', sort_order: 0 },
   { id: 'default-b2', image_url: '/images/jay-soundo-Fuc6RrdNk2c-unsplash_1jay-soundo-Fuc6RrdNk2c-unsplash.webp', alt_text: 'Behind the scenes', sort_order: 1 },
@@ -50,6 +53,7 @@ export default async function ContactPage() {
   const resolvedInfoBlocks = infoBlocks.length > 0 ? infoBlocks : defaultInfoBlocks
   const resolvedAwards = awards.length > 0 ? awards : defaultAwards
   const resolvedBtsImages = btsImages.length > 0 ? btsImages : defaultBtsImages
+  const resolvedMediaKitButtons = mediaKitButtons.length > 0 ? mediaKitButtons : defaultMediaKitButtons
 
   return (
     <>
@@ -83,7 +87,7 @@ export default async function ContactPage() {
           <div className="contact-info_wrapper">
             {resolvedInfoBlocks.map((block) => (
               <div key={block.id} className="contact-info_column">
-                <h3 className="contact-info_label">{block.label}</h3>
+                <h2 className="contact-info_label">{block.label}</h2>
                 <div className="contact-info_details">
                   {block.email && (
                     <a href={`mailto:${block.email}`} className="contact-info_link">
@@ -103,41 +107,39 @@ export default async function ContactPage() {
         </div>
       </section>
 
-      {mediaKitButtons.length > 0 && (
-        <section className="section_media-kit">
-          <div className="padding-global">
-            <div className="media-kit_wrapper">
-              {mediaKitButtons.map((btn) => (
-                <a
-                  key={btn.id}
-                  href={btn.file_url || '#'}
-                  download
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="media-kit_button"
+      <section className="section_media-kit">
+        <div className="padding-global">
+          <div className="media-kit_wrapper">
+            {resolvedMediaKitButtons.map((btn) => (
+              <a
+                key={btn.id}
+                href={btn.file_url || '#'}
+                download
+                target="_blank"
+                rel="noopener noreferrer"
+                className="media-kit_button"
+              >
+                <span className="media-kit_button-label">{btn.label}</span>
+                <svg
+                  className="media-kit_button-icon"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 >
-                  <span className="media-kit_button-label">{btn.label}</span>
-                  <svg
-                    className="media-kit_button-icon"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                    <polyline points="7 10 12 15 17 10" />
-                    <line x1="12" y1="15" x2="12" y2="3" />
-                  </svg>
-                </a>
-              ))}
-            </div>
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+              </a>
+            ))}
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
       <AwardsSection title={page?.awards_title || 'AWARDS'} awards={resolvedAwards} />
 
