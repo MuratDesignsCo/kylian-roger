@@ -11,8 +11,15 @@ export interface SiteSettings {
   about_text_html: string
   works_section_title: string
   works_section_links: WorksSectionLink[]
+  works_section_subtitle: string
+  hero_logo_top_url: string
+  hero_logo_bottom_url: string
   footer_big_name: string
   copyright_text: string
+  navbar_logo_url: string
+  footer_logo_url: string
+  nav_menu_order: string[]
+  nav_dropdown_order: string[]
   updated_at: string
 }
 
@@ -29,6 +36,14 @@ export interface PageSeo {
   og_title: string
   og_description: string
   og_image_url: string
+  updated_at: string
+}
+
+export interface PageSettings {
+  page_slug: string
+  page_title: string | null
+  items_per_page: number
+  items_per_page_alt: number | null
   updated_at: string
 }
 
@@ -54,6 +69,7 @@ export interface Project {
   cover_image_url: string
   cover_image_alt: string
   year: number
+  project_date: string | null
   sort_order: number
   is_published: boolean
   created_at: string
@@ -74,6 +90,12 @@ export interface Project {
   art_hero_label: string | null
   // Card display label (free text, replaces year display on photography page)
   card_label: string | null
+  // SEO fields (per-project meta for /works/[slug] pages)
+  meta_title: string
+  meta_description: string
+  og_title: string
+  og_description: string
+  og_image_url: string
 }
 
 export interface ProjectGalleryRow {

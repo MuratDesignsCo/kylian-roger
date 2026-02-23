@@ -140,16 +140,16 @@ export default function ArtDirectionBlocks({
           onReorder={handleReorder}
           getId={(block) => block.id}
           renderItem={(block, index) => (
-            <div className="rounded-lg border border-zinc-700 bg-zinc-800/50 p-4">
+            <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
               {/* Block header */}
               <div className="mb-4 flex items-center justify-between">
-                <span className="rounded bg-zinc-700 px-2 py-0.5 text-xs font-medium uppercase text-zinc-300">
+                <span className="rounded bg-gray-100 px-2 py-0.5 text-xs font-medium uppercase text-gray-700">
                   {block.block_type}
                 </span>
                 <button
                   type="button"
                   onClick={() => handleRemoveBlock(index)}
-                  className="rounded p-1.5 text-zinc-500 transition-colors hover:bg-zinc-700 hover:text-red-400"
+                  className="rounded p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-red-500"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
@@ -184,7 +184,7 @@ export default function ArtDirectionBlocks({
         <select
           value={addType}
           onChange={(e) => setAddType(e.target.value as BlockType)}
-          className="rounded border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-200 focus:border-zinc-500 focus:outline-none"
+          className="rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none"
         >
           {BLOCK_TYPE_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -195,7 +195,7 @@ export default function ArtDirectionBlocks({
         <button
           type="button"
           onClick={handleAddBlock}
-          className="inline-flex items-center gap-2 rounded-lg bg-zinc-700 px-4 py-2 text-sm font-medium text-zinc-200 transition-colors hover:bg-zinc-600"
+          className="inline-flex items-center gap-2 rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200"
         >
           <Plus className="h-4 w-4" />
           Add block
@@ -217,7 +217,7 @@ function ContextBlockEditor({
   return (
     <div className="space-y-3">
       <div>
-        <label className="mb-1 block text-xs font-medium text-zinc-400">
+        <label className="mb-1 block text-xs font-medium text-gray-500">
           Label
         </label>
         <input
@@ -227,11 +227,11 @@ function ContextBlockEditor({
             onChange({ ...block, context_label: e.target.value })
           }
           placeholder="e.g. Context, Challenge, Approach"
-          className="w-full rounded border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-200 placeholder-zinc-500 focus:border-zinc-500 focus:outline-none"
+          className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none"
         />
       </div>
       <div>
-        <label className="mb-1 block text-xs font-medium text-zinc-400">
+        <label className="mb-1 block text-xs font-medium text-gray-500">
           Heading
         </label>
         <input
@@ -241,11 +241,11 @@ function ContextBlockEditor({
             onChange({ ...block, context_heading: e.target.value })
           }
           placeholder="Section heading"
-          className="w-full rounded border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-200 placeholder-zinc-500 focus:border-zinc-500 focus:outline-none"
+          className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none"
         />
       </div>
       <div>
-        <label className="mb-1 block text-xs font-medium text-zinc-400">
+        <label className="mb-1 block text-xs font-medium text-gray-500">
           Text
         </label>
         <textarea
@@ -255,7 +255,7 @@ function ContextBlockEditor({
           }
           placeholder="Description text..."
           rows={4}
-          className="w-full rounded border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-200 placeholder-zinc-500 focus:border-zinc-500 focus:outline-none"
+          className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none"
         />
       </div>
     </div>
@@ -305,7 +305,7 @@ function GalleryBlockEditor({
   return (
     <div className="space-y-3">
       <div>
-        <label className="mb-1 block text-xs font-medium text-zinc-400">
+        <label className="mb-1 block text-xs font-medium text-gray-500">
           Layout
         </label>
         <select
@@ -313,7 +313,7 @@ function GalleryBlockEditor({
           onChange={(e) =>
             handleLayoutChange(e.target.value as GalleryLayout)
           }
-          className="rounded border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-200 focus:border-zinc-500 focus:outline-none"
+          className="rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none"
         >
           {GALLERY_LAYOUT_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -336,7 +336,7 @@ function GalleryBlockEditor({
       {/* Per-image type selector */}
       {block.images.length > 0 && (
         <div className="space-y-2">
-          <label className="block text-xs font-medium text-zinc-400">
+          <label className="block text-xs font-medium text-gray-500">
             Image types
           </label>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -348,14 +348,14 @@ function GalleryBlockEditor({
                 <img
                   src={img.image_url}
                   alt={img.alt_text}
-                  className="h-10 w-10 rounded border border-zinc-700 object-cover"
+                  className="h-10 w-10 rounded border border-gray-200 object-cover"
                 />
                 <select
                   value={img.image_type}
                   onChange={(e) =>
                     handleImageTypeChange(index, e.target.value as ImageType)
                   }
-                  className="flex-1 rounded border border-zinc-700 bg-zinc-800 px-2 py-1 text-xs text-zinc-200 focus:border-zinc-500 focus:outline-none"
+                  className="flex-1 rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-900 focus:border-blue-500 focus:outline-none"
                 >
                   {IMAGE_TYPE_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>
@@ -422,7 +422,7 @@ function DeliverablesBlockEditor({
               handleItemChange(index, 'number', e.target.value)
             }
             placeholder="#"
-            className="w-16 rounded border border-zinc-700 bg-zinc-800 px-2 py-2 text-center text-sm text-zinc-200 placeholder-zinc-500 focus:border-zinc-500 focus:outline-none"
+            className="w-16 rounded border border-gray-300 bg-white px-2 py-2 text-center text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none"
           />
           <input
             type="text"
@@ -431,13 +431,13 @@ function DeliverablesBlockEditor({
               handleItemChange(index, 'name', e.target.value)
             }
             placeholder="Deliverable name"
-            className="flex-1 rounded border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-200 placeholder-zinc-500 focus:border-zinc-500 focus:outline-none"
+            className="flex-1 rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none"
           />
           <button
             type="button"
             onClick={() => handleRemoveItem(index)}
             disabled={block.deliverables_items.length <= 1}
-            className="rounded p-1.5 text-zinc-500 transition-colors hover:bg-zinc-700 hover:text-red-400 disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-zinc-500"
+            className="rounded p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-red-500 disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-gray-400"
           >
             <Trash2 className="h-4 w-4" />
           </button>
@@ -447,7 +447,7 @@ function DeliverablesBlockEditor({
       <button
         type="button"
         onClick={handleAddItem}
-        className="inline-flex items-center gap-1.5 text-sm text-zinc-400 transition-colors hover:text-zinc-200"
+        className="inline-flex items-center gap-1.5 text-sm text-gray-500 transition-colors hover:text-gray-900"
       >
         <Plus className="h-3.5 w-3.5" />
         Add deliverable

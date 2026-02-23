@@ -34,7 +34,7 @@ export default function SeoPage() {
   return (
     <AuthGuard>
       {(session) => (
-        <div className="flex h-screen bg-zinc-950">
+        <div className="flex h-screen bg-white">
           <AdminSidebar session={session} />
           <main className="flex-1 overflow-y-auto">
             <SeoEditor />
@@ -85,7 +85,7 @@ function SeoEditor() {
         setOpenPanel(sorted[0].page_slug)
       }
     } catch {
-      toast.error('Erreur lors du chargement des donnees SEO')
+      toast.error('Erreur lors du chargement des données SEO')
     }
 
     setLoading(false)
@@ -124,7 +124,7 @@ function SeoEditor() {
 
       await gqlRequest(UPSERT_SEO_PAGES_MUTATION, { input: seoInput }, token)
 
-      toast.success('Parametres SEO enregistres')
+      toast.success('Paramètres SEO enregistrés')
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : 'Erreur lors de la sauvegarde'
@@ -141,7 +141,7 @@ function SeoEditor() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-6 w-6 animate-spin text-zinc-500" />
+        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
       </div>
     )
   }
@@ -151,15 +151,15 @@ function SeoEditor() {
       {/* Header */}
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">SEO</h1>
-          <p className="mt-1 text-sm text-zinc-500">
-            Configurez les meta-donnees de chaque page
+          <h1 className="text-2xl font-bold text-gray-900">SEO</h1>
+          <p className="mt-1 text-sm text-gray-500">
+            Configurez les métadonnées de chaque page
           </p>
         </div>
         <button
           onClick={handleSave}
           disabled={saving}
-          className="inline-flex items-center gap-2 rounded-md bg-white px-4 py-2 text-sm font-medium text-black transition-colors hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-md bg-black px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {saving ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -179,7 +179,7 @@ function SeoEditor() {
           return (
             <div
               key={page.id}
-              className="overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900"
+              className="overflow-hidden rounded-lg border border-gray-200 bg-white"
             >
               {/* Accordion header */}
               <button
@@ -187,38 +187,38 @@ function SeoEditor() {
                 onClick={() =>
                   setOpenPanel(isOpen ? null : page.page_slug)
                 }
-                className="flex w-full items-center justify-between px-6 py-4 text-left transition-colors hover:bg-zinc-800/50"
+                className="flex w-full items-center justify-between px-6 py-4 text-left transition-colors hover:bg-gray-50"
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-sm font-semibold text-white">
+                  <span className="text-sm font-semibold text-gray-900">
                     {label}
                   </span>
-                  <span className="rounded bg-zinc-800 px-2 py-0.5 text-xs text-zinc-500">
+                  <span className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-500">
                     /{page.page_slug === 'home' ? '' : page.page_slug}
                   </span>
                 </div>
                 {isOpen ? (
-                  <ChevronUp className="h-4 w-4 text-zinc-400" />
+                  <ChevronUp className="h-4 w-4 text-gray-400" />
                 ) : (
-                  <ChevronDown className="h-4 w-4 text-zinc-400" />
+                  <ChevronDown className="h-4 w-4 text-gray-400" />
                 )}
               </button>
 
               {/* Accordion body */}
               {isOpen && (
-                <div className="border-t border-zinc-800 px-6 py-6">
+                <div className="border-t border-gray-200 px-6 py-6">
                   <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                     {/* Meta Title */}
                     <div>
                       <div className="mb-1.5 flex items-center justify-between">
-                        <label className="text-sm font-medium text-zinc-300">
+                        <label className="text-sm font-medium text-gray-700">
                           Meta Title
                         </label>
                         <span
                           className={`text-xs ${
                             page.meta_title.length > 60
                               ? 'text-red-400'
-                              : 'text-zinc-500'
+                              : 'text-gray-500'
                           }`}
                         >
                           {page.meta_title.length}/60
@@ -230,12 +230,12 @@ function SeoEditor() {
                         onChange={(e) =>
                           updateField(page.page_slug, 'meta_title', e.target.value)
                         }
-                        className="block w-full rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500"
+                        className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                         placeholder="Titre de la page"
                       />
                       {page.meta_title.length > 60 && (
                         <p className="mt-1 text-xs text-red-400">
-                          Le titre depasse 60 caracteres (recommande)
+                          Le titre dépasse 60 caractères (recommandé)
                         </p>
                       )}
                     </div>
@@ -243,14 +243,14 @@ function SeoEditor() {
                     {/* Meta Description */}
                     <div>
                       <div className="mb-1.5 flex items-center justify-between">
-                        <label className="text-sm font-medium text-zinc-300">
+                        <label className="text-sm font-medium text-gray-700">
                           Meta Description
                         </label>
                         <span
                           className={`text-xs ${
                             page.meta_description.length > 160
                               ? 'text-red-400'
-                              : 'text-zinc-500'
+                              : 'text-gray-500'
                           }`}
                         >
                           {page.meta_description.length}/160
@@ -266,19 +266,19 @@ function SeoEditor() {
                           )
                         }
                         rows={3}
-                        className="block w-full rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500"
+                        className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                         placeholder="Description de la page"
                       />
                       {page.meta_description.length > 160 && (
                         <p className="mt-1 text-xs text-red-400">
-                          La description depasse 160 caracteres (recommande)
+                          La description dépasse 160 caractères (recommandé)
                         </p>
                       )}
                     </div>
 
                     {/* OG Title */}
                     <div>
-                      <label className="mb-1.5 block text-sm font-medium text-zinc-300">
+                      <label className="mb-1.5 block text-sm font-medium text-gray-700">
                         OG Title
                       </label>
                       <input
@@ -287,14 +287,14 @@ function SeoEditor() {
                         onChange={(e) =>
                           updateField(page.page_slug, 'og_title', e.target.value)
                         }
-                        className="block w-full rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500"
+                        className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                         placeholder="Titre Open Graph"
                       />
                     </div>
 
                     {/* OG Description */}
                     <div>
-                      <label className="mb-1.5 block text-sm font-medium text-zinc-300">
+                      <label className="mb-1.5 block text-sm font-medium text-gray-700">
                         OG Description
                       </label>
                       <textarea
@@ -307,7 +307,7 @@ function SeoEditor() {
                           )
                         }
                         rows={3}
-                        className="block w-full rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder-zinc-500 outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500"
+                        className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                         placeholder="Description Open Graph"
                       />
                     </div>
@@ -321,7 +321,7 @@ function SeoEditor() {
                         updateField(page.page_slug, 'og_image_url', url)
                       }
                       folder="seo"
-                      label="Image OG (1200x630 recommande)"
+                      label="Image OG (1200x630 recommandé)"
                     />
                   </div>
                 </div>
@@ -332,9 +332,9 @@ function SeoEditor() {
       </div>
 
       {pages.length === 0 && (
-        <div className="rounded-lg border border-zinc-800 bg-zinc-900 py-16 text-center">
-          <p className="text-sm text-zinc-500">
-            Aucune page SEO configuree dans la base de donnees
+        <div className="rounded-lg border border-gray-200 bg-white py-16 text-center">
+          <p className="text-sm text-gray-500">
+            Aucune page SEO configurée dans la base de données
           </p>
         </div>
       )}

@@ -1,38 +1,62 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import Link from 'next/link'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { gqlRequest } from '@/lib/graphql/client'
 import { PROJECTS_QUERY } from '@/lib/graphql/queries'
-import { UPDATE_PROJECT_MUTATION, DELETE_PROJECT_MUTATION } from '@/lib/graphql/mutations'
+import { DELETE_PROJECT_MUTATION } from '@/lib/graphql/mutations'
 import { getAuthToken } from '@/components/admin/AuthGuard'
 import toast from 'react-hot-toast'
-import { Plus, Pencil, Trash2, Loader2 } from 'lucide-react'
+import { Camera, Film, Palette, Plus, Trash2, Loader2, ArrowLeft, ArrowUpDown } from 'lucide-react'
 import AuthGuard from '@/components/admin/AuthGuard'
 import AdminSidebar from '@/components/admin/AdminSidebar'
 import type { Project } from '@/lib/types'
 
-const CATEGORIES = [
-  { value: '', label: 'Tous' },
-  { value: 'photography', label: 'Photographie' },
-  { value: 'film-motion', label: 'Film / Motion' },
-  { value: 'art-direction', label: 'Direction Artistique' },
+const PORTFOLIO_CATEGORIES = [
+  {
+    name: 'Photography',
+    description: 'Projets photographiques du portfolio',
+    slug: 'photography',
+    icon: Camera,
+    color: 'bg-indigo-50 text-indigo-600',
+  },
+  {
+    name: 'Film & Motion',
+    description: 'Projets vidéo et motion',
+    slug: 'film-motion',
+    icon: Film,
+    color: 'bg-purple-50 text-purple-600',
+  },
+  {
+    name: 'Art Direction',
+    description: 'Projets de direction artistique',
+    slug: 'art-direction',
+    icon: Palette,
+    color: 'bg-amber-50 text-amber-600',
+  },
 ] as const
 
 const categoryLabels: Record<string, string> = {
-  photography: 'Photographie',
-  'film-motion': 'Film / Motion',
-  'art-direction': 'Direction Artistique',
+  photography: 'Photography',
+  'film-motion': 'Film & Motion',
+  'art-direction': 'Art Direction',
 }
 
 export default function ProjectsListPage() {
   return (
     <AuthGuard>
       {(session) => (
-        <div className="flex h-screen bg-zinc-950">
+        <div className="flex h-screen bg-white">
           <AdminSidebar session={session} />
           <main className="flex-1 overflow-y-auto">
-            <ProjectsList />
+            <Suspense fallback={
+              <div className="flex items-center justify-center py-20">
+                <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+              </div>
+            }>
+              <ProjectsContent />
+            </Suspense>
           </main>
         </div>
       )}
@@ -40,19 +64,75 @@ export default function ProjectsListPage() {
   )
 }
 
-function ProjectsList() {
+function ProjectsContent() {
+  const searchParams = useSearchParams()
+  const category = searchParams.get('category')
+
+  if (category) {
+    return <CategoryProjectList category={category} />
+  }
+  return <CategoryCards />
+}
+
+// ============================================================
+// Vue 1 : Cards des catégories
+// ============================================================
+
+function CategoryCards() {
+  return (
+    <div className="p-8">
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-gray-900">Portfolio</h1>
+        <p className="mt-1 text-sm text-gray-500">
+          Gérez vos projets par catégorie
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {PORTFOLIO_CATEGORIES.map((cat) => {
+          const Icon = cat.icon
+          return (
+            <Link
+              key={cat.slug}
+              href={`/admin/projects?category=${cat.slug}`}
+              className="group rounded-lg border border-gray-200 bg-white p-6 transition-colors hover:border-gray-300 hover:shadow-sm"
+            >
+              <div className="mb-3 flex items-center gap-3">
+                <div
+                  className={`flex h-9 w-9 items-center justify-center rounded-lg ${cat.color}`}
+                >
+                  <Icon className="h-4 w-4" />
+                </div>
+                <h2 className="text-sm font-semibold text-gray-900 group-hover:text-black">
+                  {cat.name}
+                </h2>
+              </div>
+              <p className="text-sm text-gray-500">{cat.description}</p>
+            </Link>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+// ============================================================
+// Vue 2 : Liste filtrée par catégorie
+// ============================================================
+
+type SortOrder = 'recent' | 'oldest'
+
+function CategoryProjectList({ category }: { category: string }) {
+  const router = useRouter()
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState('')
-  const [togglingId, setTogglingId] = useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [sort, setSort] = useState<SortOrder>('recent')
 
   const fetchProjects = async () => {
     setLoading(true)
     try {
-      const variables: Record<string, unknown> = {}
-      if (filter) variables.category = filter
-      const data = await gqlRequest<{ projects: Project[] }>(PROJECTS_QUERY, variables)
+      const data = await gqlRequest<{ projects: Project[] }>(PROJECTS_QUERY, { category })
       setProjects(data.projects || [])
     } catch {
       toast.error('Erreur lors du chargement des projets')
@@ -63,31 +143,14 @@ function ProjectsList() {
   useEffect(() => {
     fetchProjects()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter])
+  }, [category])
 
-  const handleTogglePublish = async (project: Project) => {
-    setTogglingId(project.id)
-    try {
-      const token = getAuthToken()
-      await gqlRequest(UPDATE_PROJECT_MUTATION, {
-        id: project.id,
-        input: { slug: project.slug, category: project.category, title: project.title, is_published: !project.is_published },
-      }, token)
-      toast.success(project.is_published ? 'Projet depublie' : 'Projet publie')
-      setProjects((prev) =>
-        prev.map((p) =>
-          p.id === project.id ? { ...p, is_published: !p.is_published } : p
-        )
-      )
-    } catch {
-      toast.error('Erreur lors de la mise a jour')
-    }
-    setTogglingId(null)
-  }
+  const handleDelete = async (e: React.MouseEvent, project: Project) => {
+    e.preventDefault()
+    e.stopPropagation()
 
-  const handleDelete = async (project: Project) => {
     const confirmed = window.confirm(
-      `Supprimer le projet "${project.title}" ? Cette action est irreversible.`
+      `Supprimer le projet "${project.title}" ? Cette action est irréversible.`
     )
     if (!confirmed) return
 
@@ -95,7 +158,7 @@ function ProjectsList() {
     try {
       const token = getAuthToken()
       await gqlRequest(DELETE_PROJECT_MUTATION, { id: project.id }, token)
-      toast.success('Projet supprime')
+      toast.success('Projet supprimé')
       setProjects((prev) => prev.filter((p) => p.id !== project.id))
     } catch {
       toast.error('Erreur lors de la suppression')
@@ -103,168 +166,147 @@ function ProjectsList() {
     setDeletingId(null)
   }
 
+  const sortedProjects = [...projects].sort((a, b) => {
+    const dateA = a.project_date || `${a.year}-01-01`
+    const dateB = b.project_date || `${b.year}-01-01`
+    return sort === 'recent'
+      ? dateB.localeCompare(dateA)
+      : dateA.localeCompare(dateB)
+  })
+
+  const label = categoryLabels[category] || category
+
+  const formatDate = (project: Project) => {
+    if (project.project_date) {
+      return new Date(project.project_date + 'T00:00:00').toLocaleDateString('fr-FR', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      })
+    }
+    return String(project.year)
+  }
+
   return (
-    <div className="p-8">
+    <div className="p-8 lg:p-10">
       {/* Header */}
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-white">Projets</h1>
-          <p className="mt-1 text-sm text-zinc-500">
-            Gerez vos projets portfolio
-          </p>
+      <div className="mb-10 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Link
+            href="/admin/projects"
+            className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-900"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Link>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">{label}</h1>
+            <p className="mt-0.5 text-sm text-gray-400">
+              {projects.length} projet{projects.length > 1 ? 's' : ''}
+            </p>
+          </div>
         </div>
         <Link
-          href="/admin/projects/new"
-          className="inline-flex items-center gap-2 rounded-md bg-zinc-800 px-4 py-2 text-sm font-medium text-white border border-zinc-700 transition-colors hover:bg-zinc-700"
+          href={`/admin/projects/new?category=${category}`}
+          className="inline-flex items-center gap-2 rounded-lg bg-black px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gray-800"
         >
           <Plus className="h-4 w-4" />
           Nouveau projet
         </Link>
       </div>
 
-      {/* Category filter tabs */}
-      <div className="mb-6 flex gap-1 rounded-lg bg-zinc-900 p-1">
-        {CATEGORIES.map((cat) => (
-          <button
-            key={cat.value}
-            onClick={() => setFilter(cat.value)}
-            className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
-              filter === cat.value
-                ? 'bg-zinc-800 text-white'
-                : 'text-zinc-400 hover:text-zinc-200'
-            }`}
-          >
-            {cat.label}
-          </button>
-        ))}
-      </div>
+      {/* Sort */}
+      {projects.length > 1 && (
+        <div className="mb-6 flex items-center gap-3">
+          <ArrowUpDown className="h-4 w-4 text-gray-400" />
+          <div className="flex gap-1 rounded-lg bg-gray-100 p-1">
+            <button
+              type="button"
+              onClick={() => setSort('recent')}
+              className={`rounded-md px-3 py-1 text-xs font-medium transition-all ${
+                sort === 'recent'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Plus récents
+            </button>
+            <button
+              type="button"
+              onClick={() => setSort('oldest')}
+              className={`rounded-md px-3 py-1 text-xs font-medium transition-all ${
+                sort === 'oldest'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Plus anciens
+            </button>
+          </div>
+        </div>
+      )}
 
-      {/* Table */}
+      {/* Project list */}
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-6 w-6 animate-spin text-zinc-500" />
+          <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
         </div>
       ) : projects.length === 0 ? (
-        <div className="rounded-lg border border-zinc-800 bg-zinc-900 py-16 text-center">
-          <p className="text-sm text-zinc-500">Aucun projet trouve</p>
+        <div className="rounded-xl border border-dashed border-gray-200 py-20 text-center">
+          <p className="text-sm text-gray-400">Aucun projet</p>
+          <Link
+            href={`/admin/projects/new?category=${category}`}
+            className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-gray-900"
+          >
+            <Plus className="h-4 w-4" />
+            Créer votre premier projet
+          </Link>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-lg border border-zinc-800">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-zinc-800 bg-zinc-900">
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">
-                  Projet
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">
-                  Categorie
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">
-                  Annee
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">
-                  Ordre
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">
-                  Statut
-                </th>
-                <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-zinc-500">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-800">
-              {projects.map((project) => (
-                <tr
-                  key={project.id}
-                  className="bg-zinc-950 transition-colors hover:bg-zinc-900/50"
-                >
-                  {/* Project title + cover */}
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-3">
-                      {project.cover_image_url ? (
-                        <img
-                          src={project.cover_image_url}
-                          alt={project.cover_image_alt || project.title}
-                          className="h-10 w-14 shrink-0 rounded border border-zinc-800 object-cover"
-                        />
-                      ) : (
-                        <div className="h-10 w-14 shrink-0 rounded border border-zinc-800 bg-zinc-800" />
-                      )}
-                      <div>
-                        <p className="text-sm font-medium text-white">
-                          {project.title}
-                        </p>
-                        <p className="text-xs text-zinc-500">
-                          /{project.slug}
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-                  {/* Category */}
-                  <td className="px-4 py-3">
-                    <span className="inline-block rounded-full bg-zinc-800 px-2.5 py-0.5 text-xs font-medium text-zinc-300">
-                      {categoryLabels[project.category] || project.category}
-                    </span>
-                  </td>
-                  {/* Year */}
-                  <td className="px-4 py-3 text-sm text-zinc-400">
-                    {project.year}
-                  </td>
-                  {/* Sort order */}
-                  <td className="px-4 py-3 text-sm text-zinc-400">
-                    {project.sort_order}
-                  </td>
-                  {/* Status toggle */}
-                  <td className="px-4 py-3">
-                    <button
-                      onClick={() => handleTogglePublish(project)}
-                      disabled={togglingId === project.id}
-                      className="relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors disabled:opacity-50"
-                      style={{
-                        backgroundColor: project.is_published
-                          ? '#22c55e'
-                          : '#3f3f46',
-                      }}
-                    >
-                      <span
-                        className="inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform"
-                        style={{
-                          transform: project.is_published
-                            ? 'translateX(18px)'
-                            : 'translateX(3px)',
-                        }}
-                      />
-                    </button>
-                  </td>
-                  {/* Actions */}
-                  <td className="px-4 py-3">
-                    <div className="flex items-center justify-end gap-2">
-                      <Link
-                        href={`/admin/projects/${project.id}`}
-                        className="rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-white"
-                        title="Modifier"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Link>
-                      <button
-                        onClick={() => handleDelete(project)}
-                        disabled={deletingId === project.id}
-                        className="rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-red-400 disabled:opacity-50"
-                        title="Supprimer"
-                      >
-                        {deletingId === project.id ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Trash2 className="h-4 w-4" />
-                        )}
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="space-y-3">
+          {sortedProjects.map((project) => (
+            <Link
+              key={project.id}
+              href={`/admin/projects/${project.id}`}
+              className="group flex items-center gap-5 rounded-xl border border-gray-100 bg-white p-4 transition-all hover:border-gray-200 hover:shadow-md"
+            >
+              {/* Cover */}
+              {project.cover_image_url ? (
+                <img
+                  src={project.cover_image_url}
+                  alt={project.cover_image_alt || project.title}
+                  className="h-20 w-28 shrink-0 rounded-lg object-cover"
+                />
+              ) : (
+                <div className="flex h-20 w-28 shrink-0 items-center justify-center rounded-lg bg-gray-100">
+                  <Camera className="h-5 w-5 text-gray-300" />
+                </div>
+              )}
+
+              {/* Info */}
+              <div className="min-w-0 flex-1">
+                <h3 className="text-base font-semibold text-gray-900 group-hover:text-black">
+                  {project.title}
+                </h3>
+                <p className="mt-1 text-sm text-gray-400">
+                  {formatDate(project)}
+                </p>
+              </div>
+
+              {/* Delete */}
+              <button
+                onClick={(e) => handleDelete(e, project)}
+                disabled={deletingId === project.id}
+                className="shrink-0 rounded-lg p-2.5 text-gray-300 opacity-0 transition-all hover:bg-red-50 hover:text-red-500 group-hover:opacity-100 disabled:opacity-50"
+                title="Supprimer"
+              >
+                {deletingId === project.id ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Trash2 className="h-4 w-4" />
+                )}
+              </button>
+            </Link>
+          ))}
         </div>
       )}
     </div>
