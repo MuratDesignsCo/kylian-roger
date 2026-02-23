@@ -8,6 +8,7 @@ import fs from 'fs'
 import typeDefs from './schema/typeDefs.js'
 import resolvers from './schema/resolvers/index.js'
 import { buildContext, getTokenFromRequest, verifyToken } from './auth.js'
+import { runMigrations } from './migrate.js'
 
 const PORT = parseInt(process.env.PORT || '4000', 10)
 const UPLOAD_DIR = process.env.UPLOAD_DIR || '/data/uploads'
@@ -95,6 +96,7 @@ const server = new ApolloServer({
 })
 
 async function start() {
+  await runMigrations()
   await server.start()
 
   app.use(
