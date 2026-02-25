@@ -534,7 +534,7 @@ function HomepageEditor() {
           {/* Section Latest Works */}
           {/* ============================== */}
           <div className="admin-section">
-            <h2 className="mb-8">Latest Works</h2>
+            <h2 className="mb-8">Latest Work</h2>
 
             {/* Title & Subtitle */}
             <div className="mb-10 grid grid-cols-2 gap-8">
@@ -544,7 +544,7 @@ function HomepageEditor() {
                   type="text"
                   value={worksSectionTitle}
                   onChange={(e) => setWorksSectionTitle(e.target.value)}
-                  placeholder="LATEST WORKS"
+                  placeholder="LATEST WORK"
                 />
               </div>
               <div>

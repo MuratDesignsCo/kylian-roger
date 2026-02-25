@@ -6,9 +6,18 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: "Roc Grotesk Extra Wide";
+  src: url('/fonts/roc-grotesk-extra-wide-bold.otf') format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --background-color--background-alternate: var(--base-color--white);
   --_typography---bdo-grotesk: "Bdogrotesk Vf", Arial, sans-serif;
+  --_typography---roc-grotesk: "Roc Grotesk Extra Wide", Arial, sans-serif;
   --text-color--text-primary: var(--base-color--black);
   --_font-sizes---other-html-tags--body-all-pages: .9vw;
   --_font-sizes---headings--heading-1: 4.5vw;
@@ -51,6 +60,7 @@
 body {
   background-color: var(--background-color--background-alternate);
   font-family: var(--_typography---bdo-grotesk);
+  font-weight: 500;
   color: var(--text-color--text-primary);
   overflow-x: clip;
   font-size: var(--_font-sizes---other-html-tags--body-all-pages);
@@ -96,11 +106,15 @@ body {
   line-height: 1.4;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--_typography---roc-grotesk);
+  font-weight: 700;
+}
+
 h1 {
   font-size: var(--_font-sizes---headings--heading-1);
   margin-top: 0;
   margin-bottom: 0;
-  font-weight: 500;
   line-height: 1.1;
 }
 
@@ -108,7 +122,6 @@ h2 {
   font-size: var(--_font-sizes---headings--heading-2);
   margin-top: 0;
   margin-bottom: 0;
-  font-weight: 600;
   line-height: 1.2;
 }
 
@@ -116,7 +129,6 @@ h3 {
   font-size: var(--_font-sizes---headings--heading-3);
   margin-top: 0;
   margin-bottom: 0;
-  font-weight: 600;
   line-height: 1.2;
 }
 
@@ -124,7 +136,6 @@ h4 {
   font-size: var(--_font-sizes---headings--heading-4);
   margin-top: 0;
   margin-bottom: 0;
-  font-weight: 600;
   line-height: 1.4;
 }
 
@@ -132,7 +143,6 @@ h5 {
   font-size: var(--_font-sizes---headings--heading-5);
   margin-top: 0;
   margin-bottom: 0;
-  font-weight: 600;
   line-height: 1.5;
 }
 
@@ -140,7 +150,6 @@ h6 {
   font-size: var(--_font-sizes---headings--heading-6);
   margin-top: 0;
   margin-bottom: 0;
-  font-weight: 600;
   line-height: 1.5;
 }
 
@@ -419,8 +428,9 @@ figcaption {
 }
 
 .heading-style-h1 {
+  font-family: var(--_typography---roc-grotesk);
   font-size: var(--_font-sizes---headings--heading-1);
-  font-weight: 500;
+  font-weight: 700;
   line-height: 1.1;
 }
 
@@ -754,7 +764,6 @@ figcaption {
   visibility: hidden;
   color: var(--text-color--text-primary);
   padding-top: 1.8vw;
-  clip-path: inset(0 0 100% 0);
 }
 
 .home_hero_name-text-top svg,
@@ -781,7 +790,6 @@ figcaption {
   visibility: hidden;
   color: var(--text-color--text-primary);
   padding-bottom: 1.8vw;
-  clip-path: inset(100% 0 0 0);
 }
 
 .home_hero_name-text-bottom svg,
@@ -1532,6 +1540,7 @@ figcaption {
   width: 100%;
   display: flex;
   overflow: hidden;
+  padding-bottom: 4vw;
 }
 
 .footer_big-name-text {
@@ -1957,7 +1966,7 @@ figcaption {
 .toggle {
   border: 1px solid #fff;
   background-color: transparent;
-  border-radius: 6px;
+  border-radius: 999px;
   justify-content: flex-start;
   align-items: center;
   width: 28px;

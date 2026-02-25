@@ -116,7 +116,7 @@ export default function AdminSidebar({ session }: AdminSidebarProps) {
                       isWorksChild ? 'active' : ''
                     }`}
                   >
-                    Works
+                    Work
                     <ChevronDown
                       className={`h-3.5 w-3.5 transition-transform duration-200 ${
                         worksOpen ? 'rotate-180' : ''
