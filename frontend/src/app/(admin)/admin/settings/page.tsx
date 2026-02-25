@@ -16,7 +16,7 @@ import type { SiteSettings } from '@/lib/types'
 // Labels affichés pour les items du menu principal
 const MENU_LABELS: Record<string, string> = {
   home: 'Home',
-  works: 'Works (dropdown)',
+  works: 'Work (dropdown)',
   contact: 'Contact',
 }
 
@@ -55,7 +55,7 @@ function SettingsEditor() {
   const [navbarLogoUrl, setNavbarLogoUrl] = useState('')
   const [menuItems, setMenuItems] = useState<MenuItem[]>([
     { id: 'home', label: 'Home' },
-    { id: 'works', label: 'Works (dropdown)' },
+    { id: 'works', label: 'Work (dropdown)' },
     { id: 'contact', label: 'Contact' },
   ])
   const [dropdownItems, setDropdownItems] = useState<MenuItem[]>([
