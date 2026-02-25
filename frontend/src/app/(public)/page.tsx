@@ -34,7 +34,7 @@ export default async function HomePage() {
         hoverImages={hoverImages}
       />
       <WorksSection
-        title={settings?.works_section_title ?? 'LATEST WORKS'}
+        title={settings?.works_section_title ?? 'LATEST WORK'}
         subtitle={settings?.works_section_subtitle ?? 'Explore more'}
         links={settings?.works_section_links ?? []}
         featuredWorks={featuredWorks}

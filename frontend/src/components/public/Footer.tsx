@@ -37,7 +37,7 @@ interface FooterProps {
 // Mapping clé → { label, href } pour le menu principal
 const MAIN_MENU_MAP: Record<string, { label: string; href: string; isDropdown?: boolean }> = {
   home: { label: 'HOME', href: '/' },
-  works: { label: 'WORKS', href: '', isDropdown: true },
+  works: { label: 'WORK', href: '', isDropdown: true },
   contact: { label: 'CONTACT', href: '/contact' },
 }
 
