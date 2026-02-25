@@ -37,6 +37,7 @@ jobs:
           host: ${{ secrets.VPS_BACKEND_HOST }}
           username: ${{ secrets.VPS_BACKEND_USER }}
           key: ${{ secrets.VPS_BACKEND_SSH_KEY }}
+          port: ${{ secrets.VPS_BACKEND_SSH_PORT }}
           script: |
             cd /opt/kylian-roger/backend
             docker compose pull api

@@ -40,6 +40,7 @@ jobs:
           host: ${{ secrets.VPS_FRONTEND_HOST }}
           username: ${{ secrets.VPS_FRONTEND_USER }}
           key: ${{ secrets.VPS_FRONTEND_SSH_KEY }}
+          port: ${{ secrets.VPS_FRONTEND_SSH_PORT }}
           script: |
             cd /opt/kylian-roger/frontend
             docker compose pull
