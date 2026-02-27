@@ -36,7 +36,6 @@ export default function FilmCarousel({ projects }: FilmCarouselProps) {
     isFullscreen: false,
     galleryActive: false,
     wheelAccum: 0,
-    wheelTimer: null as ReturnType<typeof setTimeout> | null,
     touchStartY: null as number | null,
     sourceVideo: null as HTMLVideoElement | null,
     globalVolume: 1,
@@ -55,7 +54,7 @@ export default function FilmCarousel({ projects }: FilmCarouselProps) {
 
   useEffect(() => {
     const gallery = galleryRef.current
-    if (!gallery || !projects.length) return
+    if (!gallery || !projects.length || !lenis) return
 
     const items = Array.from(gallery.querySelectorAll<HTMLElement>('.film-gallery_item'))
     if (!items.length) return
@@ -67,7 +66,8 @@ export default function FilmCarousel({ projects }: FilmCarouselProps) {
     const SLIDE_EASE = 'power3.inOut'
     const CONTENT_FADE_DURATION = 0.5
     const BG_ZOOM_DURATION = 1.0
-    const WHEEL_COOLDOWN = 60
+    const WHEEL_THRESHOLD = 50
+    const WHEEL_COOLDOWN = 800
     const TOUCH_THRESHOLD = 30
 
     // GSAP context scoped to gallery — revert() kills all tweens/ScrollTriggers
@@ -184,39 +184,39 @@ export default function FilmCarousel({ projects }: FilmCarouselProps) {
         end: () => '+=' + items.length * window.innerHeight,
         pin: true,
         pinSpacing: true,
-        onEnter: () => { state.galleryActive = true; lenis?.stop() },
-        onEnterBack: () => { state.galleryActive = true; lenis?.stop() },
-        onLeave: () => { state.galleryActive = false; if (!state.isFullscreen) lenis?.start(); updateBackTopBtn() },
-        onLeaveBack: () => { state.galleryActive = false; if (!state.isFullscreen) lenis?.start(); updateBackTopBtn() },
+        onEnter: () => { state.galleryActive = true; lenis?.stop(); addTouchMove() },
+        onEnterBack: () => { state.galleryActive = true; lenis?.stop(); addTouchMove() },
+        onLeave: () => { state.galleryActive = false; removeTouchMove(); if (!state.isFullscreen) lenis?.start(); updateBackTopBtn() },
+        onLeaveBack: () => { state.galleryActive = false; removeTouchMove(); if (!state.isFullscreen) lenis?.start(); updateBackTopBtn() },
       })
     })
 
-    // Wheel handler
+    // Wheel handler — trigger immediately on threshold, then cooldown
+    let wheelLocked = false
     const onWheel = (e: WheelEvent) => {
       if (!state.galleryActive || state.isAnimating || state.isFullscreen) return
       if (state.currentIndex === 0 && e.deltaY < 0) {
-        // At first panel scrolling up: jump to pin start so ScrollTrigger can leave
         e.preventDefault()
         st.scroll(st.start)
         return
       }
       if (state.currentIndex === items.length - 1 && e.deltaY > 0) return
       e.preventDefault()
+      if (wheelLocked) return
       state.wheelAccum += e.deltaY
-      if (state.wheelTimer) clearTimeout(state.wheelTimer)
-      state.wheelTimer = setTimeout(() => {
-        if (Math.abs(state.wheelAccum) > 5) {
-          const dir = state.wheelAccum > 0 ? 1 : -1
-          goToPanel(state.currentIndex + dir)
-        }
+      if (Math.abs(state.wheelAccum) >= WHEEL_THRESHOLD) {
+        const dir = state.wheelAccum > 0 ? 1 : -1
         state.wheelAccum = 0
-      }, WHEEL_COOLDOWN)
+        wheelLocked = true
+        goToPanel(state.currentIndex + dir)
+        setTimeout(() => { wheelLocked = false }, WHEEL_COOLDOWN)
+      }
     }
     window.addEventListener('wheel', onWheel, { passive: false })
 
-    // Touch handlers
+    // Touch handlers — always capture start position so mid-gesture activation works
     const onTouchStart = (e: TouchEvent) => {
-      if (!state.galleryActive || state.isFullscreen) return
+      if (state.isFullscreen) return
       state.touchStartY = e.touches[0]?.clientY ?? null
     }
     const onTouchMove = (e: TouchEvent) => {
@@ -236,8 +236,22 @@ export default function FilmCarousel({ projects }: FilmCarouselProps) {
         goToPanel(state.currentIndex + dir)
       }
     }
+    // Add touch listeners — touchmove is added non-passive only when gallery activates
+    // to avoid blocking native scroll before the gallery is reached
     window.addEventListener('touchstart', onTouchStart, { passive: true })
-    window.addEventListener('touchmove', onTouchMove, { passive: false })
+    let touchMoveAdded = false
+    const addTouchMove = () => {
+      if (!touchMoveAdded) {
+        window.addEventListener('touchmove', onTouchMove, { passive: false })
+        touchMoveAdded = true
+      }
+    }
+    const removeTouchMove = () => {
+      if (touchMoveAdded) {
+        window.removeEventListener('touchmove', onTouchMove)
+        touchMoveAdded = false
+      }
+    }
 
     // Back to top
     function updateBackTopBtn() {
@@ -476,15 +490,13 @@ export default function FilmCarousel({ projects }: FilmCarouselProps) {
     return () => {
       // Cancel pending async callbacks
       if (rafId) cancelAnimationFrame(rafId)
-      if (state.wheelTimer) {
-        clearTimeout(state.wheelTimer)
-        state.wheelTimer = null
-      }
+      wheelLocked = false
+      state.wheelAccum = 0
       // Note: ctx.revert() is handled by useLayoutEffect (runs before DOM removal)
       // Remove global listeners
       window.removeEventListener('wheel', onWheel)
       window.removeEventListener('touchstart', onTouchStart)
-      window.removeEventListener('touchmove', onTouchMove)
+      removeTouchMove()
       document.removeEventListener('keydown', onEscape)
       backTopBtn?.removeEventListener('click', onBackTop)
       // Ensure Lenis is restarted
