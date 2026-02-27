@@ -164,7 +164,7 @@ export default function ArtProjectDetail({
         {/* Hero Section */}
         {slides.length > 0 && (
           <section className="section_project-hero">
-            <div className="project-hero_wrapper">
+            <div className="project-hero_wrapper" style={{ '--title-len': project.title.length } as React.CSSProperties}>
               <div className="project-hero_title-back" aria-hidden="true">
                 <span className="project-hero_title-text">{project.title}</span>
               </div>
@@ -362,8 +362,8 @@ export default function ArtProjectDetail({
             <div className="project-gallery_back">
               <Link href="/art-direction" className="button is-primary inline-block">
                 <div className="button_text-wrapper">
-                  <div className="button_text">VIEW ALL WORKS</div>
-                  <div className="button_text is-absolute">VIEW ALL WORKS</div>
+                  <div className="button_text">ALL WORK</div>
+                  <div className="button_text is-absolute">ALL WORK</div>
                 </div>
               </Link>
             </div>
