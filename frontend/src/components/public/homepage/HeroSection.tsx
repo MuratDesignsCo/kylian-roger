@@ -51,8 +51,10 @@ export default function HeroSection({
     const section = sectionRef.current
     if (!container || !pinWrapper || !section) return
 
-    // Lock scroll during hero intro
-    lenis?.stop()
+    const isMobile = window.innerWidth <= 991
+
+    // Lock scroll during hero intro (desktop only)
+    if (!isMobile) lenis?.stop()
 
     const imageEls = Array.from(imageRefsMap.current.values())
 
@@ -130,27 +132,30 @@ export default function HeroSection({
 
     heroTl.call(() => {
       lenis?.start()
-      cachedFullScale = computeFullscreenScale()
 
-      scrollTriggerRef.current = ScrollTrigger.create({
-        trigger: pinWrapper,
-        start: 'top top',
-        end: 'bottom bottom',
-        pin: section,
-        scrub: true,
-        onUpdate: (self) => {
-          const targetScale = 1 + (cachedFullScale - 1) * 0.98 * self.progress
-          gsap.set(container, { scale: targetScale })
-        },
-      })
-
-      const onResize = () => {
+      if (!isMobile) {
         cachedFullScale = computeFullscreenScale()
-      }
-      resizeHandlerRef.current = onResize
-      window.addEventListener('resize', onResize)
 
-      ScrollTrigger.refresh()
+        scrollTriggerRef.current = ScrollTrigger.create({
+          trigger: pinWrapper,
+          start: 'top top',
+          end: 'bottom bottom',
+          pin: section,
+          scrub: true,
+          onUpdate: (self) => {
+            const targetScale = 1 + (cachedFullScale - 1) * 0.98 * self.progress
+            gsap.set(container, { scale: targetScale })
+          },
+        })
+
+        const onResize = () => {
+          cachedFullScale = computeFullscreenScale()
+        }
+        resizeHandlerRef.current = onResize
+        window.addEventListener('resize', onResize)
+
+        ScrollTrigger.refresh()
+      }
     })
 
     // --- Navbar animation for homepage ---
