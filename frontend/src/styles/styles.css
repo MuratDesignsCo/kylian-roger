@@ -3394,10 +3394,10 @@ body.dark .text-color-alternate.footer {
 
   body {
     --_font-sizes---other-html-tags--body-all-pages: .85rem;
-    --_font-sizes---headings--heading-1: 3rem;
-    --_font-sizes---headings--heading-2: 2.5rem;
-    --_font-sizes---headings--heading-3: 2rem;
-    --_font-sizes---headings--heading-4: 1.5rem;
+    --_font-sizes---headings--heading-1: clamp(2rem, 4.5vw, 3rem);
+    --_font-sizes---headings--heading-2: clamp(1.75rem, 3.5vw, 2.5rem);
+    --_font-sizes---headings--heading-3: clamp(1.4rem, 2.8vw, 2rem);
+    --_font-sizes---headings--heading-4: clamp(1.1rem, 2vw, 1.5rem);
     --_font-sizes---headings--heading-5: 1.25rem;
     --_font-sizes---headings--heading-6: .9rem;
     --_font-sizes---other-html-tags--all-paragraphs: .85rem;
@@ -3405,6 +3405,10 @@ body.dark .text-color-alternate.footer {
     --_font-sizes---other-html-tags--all-unordered-lists: .85rem;
     --_font-sizes---other-html-tags--all-quotes: .85rem;
     --_font-sizes---other-html-tags--all-ordered-lists: .85rem;
+  }
+
+  .section_home_hero-pin-wrapper {
+    height: auto;
   }
 
   .padding-xlarge {
@@ -3638,7 +3642,7 @@ body.dark .text-color-alternate.footer {
 
   /* Dark mode mobile navbar */
   body.dark .nav-home_component {
-    background-color: #18181b;
+    background-color: #000;
   }
 
   body.dark .nav-home_component .text-color-alternate {
@@ -3783,6 +3787,11 @@ body.dark .text-color-alternate.footer {
     padding-right: 3rem;
   }
 
+  .home_about_text .text-size-large {
+    font-size: 1.15rem;
+    line-height: 1.4;
+  }
+
   .home_about_sticky-spacer {
     padding-top: 39vh;
   }
@@ -3817,6 +3826,7 @@ body.dark .text-color-alternate.footer {
   .home_works_headline-button {
     grid-column-gap: 1.5rem;
     grid-row-gap: 1.5rem;
+    padding-top: 3rem;
     position: sticky;
     top: 30vh;
   }
@@ -4259,9 +4269,9 @@ body.dark .text-color-alternate.footer {
 @media screen and (max-width: 767px) {
   body {
     --_font-sizes---other-html-tags--body-all-pages: .8rem;
-    --_font-sizes---headings--heading-1: 2.25rem;
-    --_font-sizes---headings--heading-2: 1.75rem;
-    --_font-sizes---headings--heading-3: 1.4rem;
+    --_font-sizes---headings--heading-1: clamp(1.5rem, 5.5vw, 2.25rem);
+    --_font-sizes---headings--heading-2: clamp(1.25rem, 4vw, 1.75rem);
+    --_font-sizes---headings--heading-3: clamp(1.1rem, 3vw, 1.4rem);
     --_font-sizes---headings--heading-4: 1rem;
     --_font-sizes---headings--heading-5: .9rem;
     --_font-sizes---headings--heading-6: .8rem;
@@ -4515,7 +4525,7 @@ body.dark .text-color-alternate.footer {
     align-items: center;
     text-align: center;
     gap: 0.15rem;
-    padding: 2rem 0 0;
+    padding: 0.75rem 0 2rem;
     line-height: 1.2;
   }
 
@@ -4532,6 +4542,11 @@ body.dark .text-color-alternate.footer {
     padding-left: 0.5rem;
     padding-right: 0.5rem;
     padding-bottom: 3vh;
+  }
+
+  .home_about_text .text-size-large {
+    font-size: 0.95rem;
+    line-height: 1.4;
   }
 
   .home_about_sticky-spacer {
@@ -4566,6 +4581,7 @@ body.dark .text-color-alternate.footer {
   }
 
   .home_works_headline-button {
+    padding-top: 2.5rem;
     position: sticky;
     top: 25vh;
   }
@@ -4694,6 +4710,7 @@ body.dark .text-color-alternate.footer {
     gap: 2.5rem;
     align-items: center;
     text-align: center;
+    padding-top: 2rem;
   }
 
   .contact-info_label {
@@ -4702,6 +4719,10 @@ body.dark .text-color-alternate.footer {
 
   .contact-info_link {
     font-size: .95rem;
+  }
+
+  .section_media-kit {
+    padding-top: 3rem;
   }
 
   .media-kit_wrapper {
@@ -5010,9 +5031,9 @@ body.dark .text-color-alternate.footer {
 @media screen and (max-width: 479px) {
   body {
     --_font-sizes---other-html-tags--body-all-pages: .8rem;
-    --_font-sizes---headings--heading-1: 1.75rem;
-    --_font-sizes---headings--heading-2: 1.4rem;
-    --_font-sizes---headings--heading-3: 1.15rem;
+    --_font-sizes---headings--heading-1: clamp(1.25rem, 5.5vw, 1.75rem);
+    --_font-sizes---headings--heading-2: clamp(1.1rem, 4vw, 1.4rem);
+    --_font-sizes---headings--heading-3: clamp(1rem, 3vw, 1.15rem);
     --_font-sizes---headings--heading-4: 1rem;
     --_font-sizes---headings--heading-5: .9rem;
     --_font-sizes---headings--heading-6: .8rem;
@@ -5118,7 +5139,7 @@ body.dark .text-color-alternate.footer {
   }
 
   .home_hero_role-mobile {
-    padding: 1.5rem 0 0;
+    padding: 0.5rem 0 1.5rem;
   }
 
   .home_about_wrapper {
@@ -5129,6 +5150,11 @@ body.dark .text-color-alternate.footer {
     padding-left: 0;
     padding-right: 0;
     padding-bottom: 2vh;
+  }
+
+  .home_about_text .text-size-large {
+    font-size: 0.8rem;
+    line-height: 1.4;
   }
 
   .home_about_sticky-spacer {

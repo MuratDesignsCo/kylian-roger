@@ -62,6 +62,9 @@ export default function FilmCarousel({ projects }: FilmCarouselProps) {
     const state = stateRef.current
     const backTopBtn = backTopRef.current
 
+    // On tablet/mobile: skip snap scroll, use classic scroll
+    const isMobile = window.innerWidth <= 991
+
     const SLIDE_DURATION = 0.7
     const SLIDE_EASE = 'power3.inOut'
     const CONTENT_FADE_DURATION = 0.5
@@ -74,6 +77,11 @@ export default function FilmCarousel({ projects }: FilmCarouselProps) {
     const ctx = gsap.context(() => {}, gallery)
     gsapCtxRef.current = ctx
 
+    // Dummy functions for mobile (no touch snap)
+    let addTouchMove = () => {}
+    let removeTouchMove = () => {}
+
+    if (!isMobile) {
     // Layout setup (inside context so revert() cleans inline styles)
     ctx.add(() => {
       gsap.set(gallery, {
@@ -240,13 +248,13 @@ export default function FilmCarousel({ projects }: FilmCarouselProps) {
     // to avoid blocking native scroll before the gallery is reached
     window.addEventListener('touchstart', onTouchStart, { passive: true })
     let touchMoveAdded = false
-    const addTouchMove = () => {
+    addTouchMove = () => {
       if (!touchMoveAdded) {
         window.addEventListener('touchmove', onTouchMove, { passive: false })
         touchMoveAdded = true
       }
     }
-    const removeTouchMove = () => {
+    removeTouchMove = () => {
       if (touchMoveAdded) {
         window.removeEventListener('touchmove', onTouchMove)
         touchMoveAdded = false
@@ -278,6 +286,7 @@ export default function FilmCarousel({ projects }: FilmCarouselProps) {
       goToPanel(0, true)
     }
     backTopBtn?.addEventListener('click', onBackTop)
+    } // end if (!isMobile)
 
     // Volume helpers
     function updateMuteBtn(btn: HTMLButtonElement | null, muted: boolean) {
@@ -488,17 +497,9 @@ export default function FilmCarousel({ projects }: FilmCarouselProps) {
     }
 
     return () => {
-      // Cancel pending async callbacks
-      if (rafId) cancelAnimationFrame(rafId)
-      wheelLocked = false
-      state.wheelAccum = 0
       // Note: ctx.revert() is handled by useLayoutEffect (runs before DOM removal)
-      // Remove global listeners
-      window.removeEventListener('wheel', onWheel)
-      window.removeEventListener('touchstart', onTouchStart)
       removeTouchMove()
       document.removeEventListener('keydown', onEscape)
-      backTopBtn?.removeEventListener('click', onBackTop)
       // Ensure Lenis is restarted
       lenis?.start()
     }

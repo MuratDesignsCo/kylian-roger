@@ -37,6 +37,8 @@ export default function AboutSection({ html, hoverImages }: AboutSectionProps) {
       let cleanAttrs = attrs
         .replace(/\s*class="[^"]*"/g, '')
         .replace(/\s*data-hover-img="[^"]*"/g, '')
+        .replace(/\s*target="[^"]*"/g, '')
+        .replace(/\s*rel="[^"]*"/g, '')
         .trim()
 
       return `<a class="about-hover-link" data-hover-img="${imgUrl}" ${cleanAttrs}>`
