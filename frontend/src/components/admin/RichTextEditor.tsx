@@ -18,6 +18,7 @@ import {
   Upload,
   Loader2,
 } from 'lucide-react'
+import toast from 'react-hot-toast'
 import { getAuthToken } from '@/components/admin/AuthGuard'
 import { UPLOAD_URL } from '@/lib/graphql/client'
 
@@ -175,6 +176,13 @@ export default function RichTextEditor({
   ) => {
     const file = e.target.files?.[0]
     if (!file) return
+    const allowedExts = ['.jpg', '.jpeg', '.png', '.webp', '.avif']
+    const ext = file.name.toLowerCase().slice(file.name.lastIndexOf('.'))
+    if (!allowedExts.includes(ext)) {
+      toast.error('Format non supporté. Utilisez JPEG, PNG, WebP ou AVIF.')
+      e.target.value = ''
+      return
+    }
     setHoverImgUploading(true)
     try {
       const formData = new FormData()
@@ -357,8 +365,7 @@ export default function RichTextEditor({
               <input
                 ref={hoverFileRef}
                 type="file"
-                accept="image/jpeg,image/png,image/webp"
-                className="hidden"
+                                className="hidden"
                 onChange={handleHoverImgUpload}
               />
             </div>
