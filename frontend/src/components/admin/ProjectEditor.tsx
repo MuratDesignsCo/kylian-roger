@@ -518,6 +518,8 @@ export default function ProjectEditorPage({ id, defaultCategory }: ProjectEditor
     )
   }
 
+  const imageExts = ['.jpg', '.jpeg', '.png', '.webp', '.avif']
+
   const handleGalleryFileUpload = async (rowTempId: string, files: FileList | null) => {
     if (!files || files.length === 0) return
     const token = getAuthToken()
@@ -527,6 +529,11 @@ export default function ProjectEditorPage({ id, defaultCategory }: ProjectEditor
 
     for (let i = 0; i < Math.min(files.length, maxToAdd); i++) {
       const file = files[i]
+      const ext = file.name.toLowerCase().slice(file.name.lastIndexOf('.'))
+      if (!imageExts.includes(ext)) {
+        toast.error(`${file.name} : format non supporté. Utilisez JPEG, PNG, WebP ou AVIF.`)
+        continue
+      }
       if (file.size > 5 * 1024 * 1024) {
         toast.error(`${file.name} dépasse 5 Mo`)
         continue
@@ -625,6 +632,11 @@ export default function ProjectEditorPage({ id, defaultCategory }: ProjectEditor
 
     for (let i = 0; i < Math.min(files.length, maxToAdd); i++) {
       const file = files[i]
+      const ext = file.name.toLowerCase().slice(file.name.lastIndexOf('.'))
+      if (!imageExts.includes(ext)) {
+        toast.error(`${file.name} : format non supporté. Utilisez JPEG, PNG, WebP ou AVIF.`)
+        continue
+      }
       if (file.size > 5 * 1024 * 1024) {
         toast.error(`${file.name} dépasse 5 Mo`)
         continue
@@ -1018,8 +1030,7 @@ export default function ProjectEditorPage({ id, defaultCategory }: ProjectEditor
                           <Plus className="h-5 w-5" />
                           <input
                             type="file"
-                            accept="image/jpeg,image/png,image/webp,image/avif"
-                            multiple
+                                                        multiple
                             className="hidden"
                             onChange={(e) => {
                               handleGalleryFileUpload(row.tempId, e.target.files)
@@ -1385,8 +1396,7 @@ export default function ProjectEditorPage({ id, defaultCategory }: ProjectEditor
                             <Plus className="h-5 w-5" />
                             <input
                               type="file"
-                              accept="image/jpeg,image/png,image/webp,image/avif"
-                              multiple
+                                                            multiple
                               className="hidden"
                               onChange={(e) => {
                                 handleBlockGalleryUpload(block.tempId, e.target.files)

@@ -796,9 +796,17 @@ function FileUploadField({
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [uploading, setUploading] = useState(false)
 
+  const allowedExts = ['.pdf', '.jpg', '.jpeg', '.png', '.webp', '.avif']
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
+    const ext = file.name.toLowerCase().slice(file.name.lastIndexOf('.'))
+    if (!allowedExts.includes(ext)) {
+      toast.error('Format non supporté. Utilisez PDF, JPEG, PNG, WebP ou AVIF.')
+      e.target.value = ''
+      return
+    }
     setUploading(true)
     try {
       const formData = new FormData()
@@ -864,8 +872,7 @@ function FileUploadField({
       <input
         ref={fileInputRef}
         type="file"
-        accept="application/pdf,image/jpeg,image/png,image/webp"
-        className="hidden"
+                className="hidden"
         onChange={handleFileChange}
       />
     </div>
@@ -886,9 +893,17 @@ function AwardThumbnail({
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [uploading, setUploading] = useState(false)
 
+  const imageExts = ['.jpg', '.jpeg', '.png', '.webp', '.avif']
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
+    const ext = file.name.toLowerCase().slice(file.name.lastIndexOf('.'))
+    if (!imageExts.includes(ext)) {
+      toast.error('Format non supporté. Utilisez JPEG, PNG, WebP ou AVIF.')
+      e.target.value = ''
+      return
+    }
     setUploading(true)
     try {
       const formData = new FormData()
@@ -943,8 +958,7 @@ function AwardThumbnail({
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/jpeg,image/png,image/webp,image/avif"
-        className="hidden"
+                className="hidden"
         onChange={handleFileChange}
       />
     </div>
@@ -1036,9 +1050,17 @@ function SortableBtsImage({
     opacity: isDragging ? 0.5 : 1,
   }
 
+  const btsImageExts = ['.jpg', '.jpeg', '.png', '.webp', '.avif']
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
+    const ext = file.name.toLowerCase().slice(file.name.lastIndexOf('.'))
+    if (!btsImageExts.includes(ext)) {
+      toast.error('Format non supporté. Utilisez JPEG, PNG, WebP ou AVIF.')
+      e.target.value = ''
+      return
+    }
     setUploading(true)
     try {
       const formData = new FormData()
@@ -1119,8 +1141,7 @@ function SortableBtsImage({
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/jpeg,image/png,image/webp,image/avif"
-        className="hidden"
+                className="hidden"
         onChange={handleFileChange}
       />
     </div>
