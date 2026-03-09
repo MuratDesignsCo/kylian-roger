@@ -137,9 +137,18 @@ function SortableSlide({
     cursor: isDragging ? 'grabbing' : 'grab',
   }
 
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/avif']
+  const allowedExts = ['.jpg', '.jpeg', '.png', '.webp', '.avif']
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
+    const ext = file.name.toLowerCase().slice(file.name.lastIndexOf('.'))
+    if (!allowedTypes.includes(file.type) && !allowedExts.includes(ext)) {
+      toast.error('Format non supporté. Utilisez JPEG, PNG, WebP ou AVIF.')
+      e.target.value = ''
+      return
+    }
     setUploading(true)
     try {
       const formData = new FormData()
@@ -193,7 +202,6 @@ function SortableSlide({
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/jpeg,image/png,image/webp,image/avif"
           className="hidden"
           onChange={handleFileChange}
         />
