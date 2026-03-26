@@ -21,8 +21,8 @@ const defaultBioHtml = `<p>Lorem ipsum dolor sit amet, consectetur adipiscing el
 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>`
 
 const defaultInfoBlocks: ContactInfoBlock[] = [
-  { id: 'default-us', label: 'United States', email: 'kylian@rogerusa.com', phone: '+1 (212) 555-1234', sort_order: 0 },
-  { id: 'default-fr', label: 'France', email: 'kylian@rogerfrance.com', phone: '+33 6 12 34 56 78', sort_order: 1 },
+  { id: 'default-us', label: 'United States', email: 'kylian@rogerusa.com', phone: '+1 (212) 555-1234', agency_name: '', agency_website: '', sort_order: 0 },
+  { id: 'default-fr', label: 'France', email: 'kylian@rogerfrance.com', phone: '+33 6 12 34 56 78', agency_name: '', agency_website: '', sort_order: 1 },
 ]
 
 const defaultAwards: Award[] = [
@@ -98,6 +98,15 @@ export default async function ContactPage() {
                     <a href={`tel:${block.phone.replace(/\s/g, '')}`} className="contact-info_link">
                       {block.phone}
                     </a>
+                  )}
+                  {block.agency_name && (
+                    block.agency_website ? (
+                      <a href={block.agency_website} target="_blank" rel="noopener noreferrer" className="contact-info_link">
+                        {block.agency_name}
+                      </a>
+                    ) : (
+                      <span className="contact-info_link">{block.agency_name}</span>
+                    )
                   )}
                 </div>
               </div>

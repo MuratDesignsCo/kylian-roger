@@ -55,8 +55,8 @@ export const contactResolvers = {
         const blocks = input.infoBlocks as Array<Record<string, unknown>>
         for (const block of blocks) {
           await pool.query(
-            'INSERT INTO contact_info_blocks (label, email, phone, sort_order) VALUES ($1, $2, $3, $4)',
-            [block.label, block.email || '', block.phone || '', block.sort_order || 0]
+            'INSERT INTO contact_info_blocks (label, email, phone, agency_name, agency_website, sort_order) VALUES ($1, $2, $3, $4, $5, $6)',
+            [block.label, block.email || '', block.phone || '', block.agency_name || '', block.agency_website || '', block.sort_order || 0]
           )
         }
       }

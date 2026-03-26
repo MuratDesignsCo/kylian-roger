@@ -176,10 +176,10 @@ export default function RichTextEditor({
   ) => {
     const file = e.target.files?.[0]
     if (!file) return
-    const allowedExts = ['.jpg', '.jpeg', '.png', '.webp', '.avif']
+    const allowedExts = ['.jpg', '.jpeg', '.png', '.webp', '.avif', '.gif']
     const ext = file.name.toLowerCase().slice(file.name.lastIndexOf('.'))
     if (!allowedExts.includes(ext)) {
-      toast.error('Format non supporté. Utilisez JPEG, PNG, WebP ou AVIF.')
+      toast.error('Format non supporté. Utilisez JPEG, PNG, WebP, AVIF ou GIF.')
       e.target.value = ''
       return
     }

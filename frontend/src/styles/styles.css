@@ -1154,7 +1154,7 @@ figcaption {
 
 /* Black fill rising from bottom on hover — full viewport width */
 .home_awards_list-text-background-overlay {
-  background-color: #000;
+  background-color: var(--text-color--text-primary);
   height: 0%;
   position: absolute;
   left: -2rem;
@@ -1168,7 +1168,7 @@ figcaption {
   height: 100%;
 }
 
-/* Text layer: on top of everything, turns white on hover */
+/* Text layer: on top of everything, inverts on hover */
 .home_awards_list-text {
   z-index: 3;
   grid-column-gap: 1vw;
@@ -1184,7 +1184,7 @@ figcaption {
 }
 
 .home_awards_list-item:hover .home_awards_list-text {
-  color: #fff;
+  color: var(--background-color--background-alternate);
 }
 
 /* Image container: kept in DOM but hidden (floating image managed by JS) */
@@ -1244,7 +1244,7 @@ figcaption {
 }
 
 .home_awards_list-item:hover .home_awards_line {
-  background-color: #fff;
+  background-color: var(--background-color--background-alternate);
 }
 
 .text-link-reveal_component {
@@ -1585,9 +1585,10 @@ figcaption {
 /* --- Photography gallery --- */
 .photo-gallery_list {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: repeat(4, 1fr);
   grid-column-gap: 1vw;
   grid-row-gap: 3vw;
+  align-items: start;
 }
 
 .photo-gallery_item {
@@ -1598,15 +1599,14 @@ figcaption {
 
 .photo-gallery_image-wrapper {
   width: 100%;
-  aspect-ratio: 16 / 9;
   position: relative;
   overflow: hidden;
 }
 
 .photo-gallery_image {
-  object-fit: cover;
   width: 100%;
-  height: 100%;
+  height: auto;
+  display: block;
   will-change: transform;
 }
 
@@ -2237,12 +2237,13 @@ figcaption {
 
 .contact-info_column {
   flex: none;
+  text-align: center;
 }
 
 .contact-info_label {
   color: var(--text-color--text-primary);
   font-size: 1.25vw;
-  font-weight: 500;
+  font-weight: 400;
   text-transform: uppercase;
   margin-bottom: 1rem;
 }
@@ -2296,8 +2297,8 @@ figcaption {
 }
 
 .media-kit_button:hover {
-  background-color: var(--background-color--background-primary);
-  color: var(--text-color--text-alternate);
+  background-color: var(--text-color--text-primary);
+  color: var(--background-color--background-alternate);
 }
 
 .media-kit_button-icon {
@@ -2715,9 +2716,33 @@ body.dark .text-color-alternate.footer {
 
 .film-gallery_info {
   display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1vw;
+  width: 100%;
+}
+
+.film-gallery_info-text {
+  display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 0.3vw;
+}
+
+.film-gallery_socials {
+  display: flex;
+  gap: 0.8vw;
+  align-items: center;
+}
+
+.film-gallery_socials a {
+  color: rgba(255, 255, 255, 0.5);
+  transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.film-gallery_socials a:hover {
+  color: #fff;
 }
 
 .film-gallery_title {
@@ -3254,7 +3279,7 @@ body.dark .text-color-alternate.footer {
 
 .project-gallery_back .button:hover {
   background-color: var(--text-color--text-primary);
-  color: var(--text-color--text-alternate);
+  color: var(--background-color--background-alternate);
 }
 
 /* --- Project detail page — Details section (art direction) --- */
@@ -4865,10 +4890,6 @@ body.dark .text-color-alternate.footer {
     grid-row-gap: 2.5rem;
   }
 
-  .photo-gallery_image-wrapper {
-    aspect-ratio: 4 / 5;
-  }
-
   .photo-gallery_item-info {
     padding-top: 0.5rem;
   }
@@ -5395,9 +5416,6 @@ body.dark .text-color-alternate.footer {
     grid-row-gap: 2rem;
   }
 
-  .photo-gallery_image-wrapper {
-    aspect-ratio: 3 / 4;
-  }
 
   .photo-gallery_item-info {
     padding-top: 0.4rem;
