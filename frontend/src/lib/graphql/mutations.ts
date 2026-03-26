@@ -88,6 +88,11 @@ export const UPDATE_PROJECT_MUTATION = `
       project_date
       sort_order
       is_published
+      featuring
+      show_featuring
+      social_instagram_url
+      social_facebook_url
+      social_linkedin_url
     }
   }
 `
@@ -187,6 +192,8 @@ export const UPDATE_CONTACT_MUTATION = `
         label
         email
         phone
+        agency_name
+        agency_website
         sort_order
       }
       awards {

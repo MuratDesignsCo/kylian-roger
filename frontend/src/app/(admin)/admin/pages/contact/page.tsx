@@ -50,6 +50,8 @@ interface InfoBlockLocal {
   label: string
   email: string
   phone: string
+  agency_name: string
+  agency_website: string
 }
 
 interface AwardLocal {
@@ -158,6 +160,8 @@ function ContactEditor() {
           label: b.label || '',
           email: b.email || '',
           phone: b.phone || '',
+          agency_name: b.agency_name || '',
+          agency_website: b.agency_website || '',
         }))
       )
 
@@ -231,6 +235,8 @@ function ContactEditor() {
                 label: b.label,
                 email: b.email,
                 phone: b.phone,
+                agency_name: b.agency_name,
+                agency_website: b.agency_website,
                 sort_order: i,
               })),
               awards: awards.map((a, i) => ({
@@ -294,7 +300,7 @@ function ContactEditor() {
     if (infoBlocks.length >= 4) return
     setInfoBlocks((prev) => [
       ...prev,
-      { tempId: genTempId(), label: '', email: '', phone: '' },
+      { tempId: genTempId(), label: '', email: '', phone: '', agency_name: '', agency_website: '' },
     ])
   }
 
@@ -545,6 +551,28 @@ function ContactEditor() {
                           updateInfoBlock(block.tempId, 'phone', e.target.value)
                         }
                         placeholder="+33 6 00 00 00 00"
+                      />
+                    </div>
+                    <div>
+                      <label className="block">Nom de l&apos;agence</label>
+                      <input
+                        type="text"
+                        value={block.agency_name}
+                        onChange={(e) =>
+                          updateInfoBlock(block.tempId, 'agency_name', e.target.value)
+                        }
+                        placeholder="Nom de l'agence"
+                      />
+                    </div>
+                    <div>
+                      <label className="block">Site web de l&apos;agence</label>
+                      <input
+                        type="url"
+                        value={block.agency_website}
+                        onChange={(e) =>
+                          updateInfoBlock(block.tempId, 'agency_website', e.target.value)
+                        }
+                        placeholder="https://agence.com"
                       />
                     </div>
                   </div>

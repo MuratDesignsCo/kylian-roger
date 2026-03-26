@@ -84,6 +84,11 @@ const typeDefs = gql`
     art_tags: [String!]
     art_hero_label: String
     card_label: String
+    featuring: String
+    show_featuring: Boolean!
+    social_instagram_url: String
+    social_facebook_url: String
+    social_linkedin_url: String
     # SEO fields (per-project meta for /works/[slug] pages)
     meta_title: String!
     meta_description: String!
@@ -168,6 +173,8 @@ const typeDefs = gql`
     label: String!
     email: String!
     phone: String!
+    agency_name: String!
+    agency_website: String!
     sort_order: Int!
   }
 
@@ -312,6 +319,11 @@ const typeDefs = gql`
     art_tags: [String!]
     art_hero_label: String
     card_label: String
+    featuring: String
+    show_featuring: Boolean
+    social_instagram_url: String
+    social_facebook_url: String
+    social_linkedin_url: String
     meta_title: String
     meta_description: String
     og_title: String
@@ -358,6 +370,8 @@ const typeDefs = gql`
     label: String!
     email: String
     phone: String
+    agency_name: String
+    agency_website: String
     sort_order: Int
   }
 

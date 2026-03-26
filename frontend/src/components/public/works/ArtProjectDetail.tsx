@@ -211,14 +211,16 @@ export default function ArtProjectDetail({
                         </div>
                       </button>
                     </div>
-                    <div className="project-hero_info-right">
-                      <div className="overflow-hidden">
-                        <div className="project-hero_info-label text-color-secondary">YEAR</div>
+                    {project.show_featuring && project.featuring && (
+                      <div className="project-hero_info-right">
+                        <div className="overflow-hidden">
+                          <div className="project-hero_info-label text-color-secondary">FEATURING</div>
+                        </div>
+                        <div className="overflow-hidden">
+                          <div className="project-hero_info-value">{project.featuring}</div>
+                        </div>
                       </div>
-                      <div className="overflow-hidden">
-                        <div className="project-hero_info-value">{project.year}</div>
-                      </div>
-                    </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -244,14 +246,10 @@ export default function ArtProjectDetail({
                     <span className="project-details_meta-value">{project.art_role}</span>
                   </div>
                 )}
-                <div className="project-details_meta-item">
-                  <span className="project-details_meta-label text-color-secondary">ANNÉE</span>
-                  <span className="project-details_meta-value">{project.year}</span>
-                </div>
-                {project.card_label && (
+                {project.show_featuring && project.featuring && (
                   <div className="project-details_meta-item">
                     <span className="project-details_meta-label text-color-secondary">FEATURING</span>
-                    <span className="project-details_meta-value">{project.card_label}</span>
+                    <span className="project-details_meta-value">{project.featuring}</span>
                   </div>
                 )}
                 {project.art_tags && project.art_tags.length > 0 && (
