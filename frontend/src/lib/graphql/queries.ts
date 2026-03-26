@@ -179,6 +179,11 @@ export const PROJECTS_QUERY = `
       art_tags
       art_hero_label
       card_label
+      featuring
+      show_featuring
+      social_instagram_url
+      social_facebook_url
+      social_linkedin_url
     }
   }
 `
@@ -208,6 +213,11 @@ export const PROJECT_BY_SLUG_QUERY = `
       art_tags
       art_hero_label
       card_label
+      featuring
+      show_featuring
+      social_instagram_url
+      social_facebook_url
+      social_linkedin_url
       meta_title
       meta_description
       og_title
@@ -282,6 +292,11 @@ export const PROJECT_BY_ID_QUERY = `
       art_tags
       art_hero_label
       card_label
+      featuring
+      show_featuring
+      social_instagram_url
+      social_facebook_url
+      social_linkedin_url
       meta_title
       meta_description
       og_title
@@ -349,6 +364,8 @@ export const CONTACT_QUERY = `
         label
         email
         phone
+        agency_name
+        agency_website
         sort_order
       }
       awards {
@@ -393,6 +410,8 @@ export const ADMIN_CONTACT_QUERY = `
         label
         email
         phone
+        agency_name
+        agency_website
         sort_order
       }
       awards {

@@ -190,14 +190,16 @@ export default function PhotoProjectDetail({
                       </div>
                     </button>
                   </div>
-                  <div className="project-hero_info-right">
-                    <div className="overflow-hidden">
-                      <div className="project-hero_info-label text-color-secondary">YEAR</div>
+                  {project.show_featuring && project.featuring && (
+                    <div className="project-hero_info-right">
+                      <div className="overflow-hidden">
+                        <div className="project-hero_info-label text-color-secondary">FEATURING</div>
+                      </div>
+                      <div className="overflow-hidden">
+                        <div className="project-hero_info-value">{project.featuring}</div>
+                      </div>
                     </div>
-                    <div className="overflow-hidden">
-                      <div className="project-hero_info-value">{project.year}</div>
-                    </div>
-                  </div>
+                  )}
                 </div>
               </div>
             </div>

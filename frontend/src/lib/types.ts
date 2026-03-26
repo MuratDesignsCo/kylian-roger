@@ -90,6 +90,12 @@ export interface Project {
   art_hero_label: string | null
   // Card display label (free text, replaces year display on photography page)
   card_label: string | null
+  // Featuring
+  featuring: string | null
+  show_featuring: boolean
+  social_instagram_url: string | null
+  social_facebook_url: string | null
+  social_linkedin_url: string | null
   // SEO fields (per-project meta for /works/[slug] pages)
   meta_title: string
   meta_description: string
@@ -179,6 +185,8 @@ export interface ContactInfoBlock {
   label: string
   email: string
   phone: string
+  agency_name: string
+  agency_website: string
   sort_order: number
 }
 

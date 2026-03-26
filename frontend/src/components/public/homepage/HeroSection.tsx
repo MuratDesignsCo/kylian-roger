@@ -93,7 +93,8 @@ export default function HeroSection({
       '-=0.7'
     )
 
-    // 6. Role and Based text
+    // 6. Role and Based text + trigger navbar at the same time
+    const rolePosition = heroTl.duration() - 0.6
     heroTl.fromTo(
       '.home_hero-role',
       { y: 15 },
@@ -108,11 +109,11 @@ export default function HeroSection({
       '-=0.5'
     )
 
-    // 7. Trigger navbar animation
+    // 7. Trigger navbar animation (same time as role text)
     heroTl.call(() => {
       ;(window as unknown as Record<string, unknown>).__heroNavReady = true
       window.dispatchEvent(new CustomEvent('heroNavReady'))
-    })
+    }, [], rolePosition)
 
     // 8. Setup scroll expansion after intro completes
     let cachedFullScale = 1

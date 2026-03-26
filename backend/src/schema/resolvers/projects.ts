@@ -106,7 +106,8 @@ export const projectsResolvers = {
         'photo_subcategory', 'photo_location',
         'film_video_url', 'film_bg_image_url', 'film_subtitle', 'film_layout',
         'art_client', 'art_role', 'art_description', 'art_tags', 'art_hero_label',
-        'card_label',
+        'card_label', 'featuring', 'show_featuring',
+        'social_instagram_url', 'social_facebook_url', 'social_linkedin_url',
         'meta_title', 'meta_description', 'og_title', 'og_description', 'og_image_url',
       ]
       const presentFields = fields.filter(f => input[f] !== undefined)

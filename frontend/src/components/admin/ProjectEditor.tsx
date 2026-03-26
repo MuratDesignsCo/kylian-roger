@@ -131,6 +131,8 @@ export default function ProjectEditorPage({ id, defaultCategory }: ProjectEditor
   const [coverImageAlt, setCoverImageAlt] = useState('')
   const [projectDate, setProjectDate] = useState('')
   const [cardLabel, setCardLabel] = useState('')
+  const [featuring, setFeaturing] = useState('')
+  const [showFeaturing, setShowFeaturing] = useState(false)
 
   // Photography fields
   const [photoLocation, setPhotoLocation] = useState('')
@@ -141,6 +143,9 @@ export default function ProjectEditorPage({ id, defaultCategory }: ProjectEditor
   const [filmBgImageUrl, setFilmBgImageUrl] = useState('')
   const [filmSubtitle, setFilmSubtitle] = useState('')
   const [filmLayout, setFilmLayout] = useState<'landscape' | 'vertical'>('landscape')
+  const [socialInstagramUrl, setSocialInstagramUrl] = useState('')
+  const [socialFacebookUrl, setSocialFacebookUrl] = useState('')
+  const [socialLinkedinUrl, setSocialLinkedinUrl] = useState('')
 
   // Art Direction fields
   const [artClient, setArtClient] = useState('')
@@ -210,6 +215,8 @@ export default function ProjectEditorPage({ id, defaultCategory }: ProjectEditor
       setCoverImageAlt(project.cover_image_alt || '')
       setProjectDate(project.project_date || '')
       setCardLabel(project.card_label || '')
+      setFeaturing(project.featuring || '')
+      setShowFeaturing(project.show_featuring ?? false)
 
       // SEO fields
       setSeoData({
@@ -248,6 +255,9 @@ export default function ProjectEditorPage({ id, defaultCategory }: ProjectEditor
         setFilmBgImageUrl(project.film_bg_image_url || '')
         setFilmSubtitle(project.film_subtitle || '')
         setFilmLayout(project.film_layout || 'landscape')
+        setSocialInstagramUrl(project.social_instagram_url || '')
+        setSocialFacebookUrl(project.social_facebook_url || '')
+        setSocialLinkedinUrl(project.social_linkedin_url || '')
       } else if (project.category === 'art-direction') {
         setArtClient(project.art_client || '')
         setArtRole(project.art_role || '')
@@ -334,12 +344,17 @@ export default function ProjectEditorPage({ id, defaultCategory }: ProjectEditor
         sort_order: 0,
         is_published: true,
         card_label: cardLabel.trim() || null,
+        featuring: featuring.trim() || null,
+        show_featuring: showFeaturing,
         photo_subcategory: null,
         photo_location: category === 'photography' ? photoLocation || null : null,
         film_video_url: category === 'film-motion' ? filmVideoUrl || null : null,
         film_bg_image_url: category === 'film-motion' ? filmBgImageUrl || null : null,
         film_subtitle: category === 'film-motion' ? filmSubtitle || null : null,
         film_layout: category === 'film-motion' ? filmLayout : null,
+        social_instagram_url: category === 'film-motion' ? socialInstagramUrl || null : null,
+        social_facebook_url: category === 'film-motion' ? socialFacebookUrl || null : null,
+        social_linkedin_url: category === 'film-motion' ? socialLinkedinUrl || null : null,
         art_client: category === 'art-direction' ? artClient || null : null,
         art_role: category === 'art-direction' ? artRole || null : null,
         art_description: category === 'art-direction' ? artDescription || null : null,
@@ -873,16 +888,27 @@ export default function ProjectEditorPage({ id, defaultCategory }: ProjectEditor
               label="Date"
             />
 
-            {/* Featuring — masqué pour film-motion */}
+            {/* Featuring */}
             {category !== 'film-motion' && (
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                  Featuring
-                </label>
+                <div className="mb-1.5 flex items-center justify-between">
+                  <label className="text-sm font-medium text-gray-700">
+                    Featuring
+                  </label>
+                  <label className="flex cursor-pointer items-center gap-2 text-xs text-gray-500">
+                    <span>Afficher sur la page</span>
+                    <input
+                      type="checkbox"
+                      checked={showFeaturing}
+                      onChange={(e) => setShowFeaturing(e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                  </label>
+                </div>
                 <input
                   type="text"
-                  value={cardLabel}
-                  onChange={(e) => setCardLabel(e.target.value)}
+                  value={featuring}
+                  onChange={(e) => setFeaturing(e.target.value)}
                   className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   placeholder="Ex: Studio Harcourt"
                 />
@@ -1155,6 +1181,45 @@ export default function ProjectEditorPage({ id, defaultCategory }: ProjectEditor
                   label="Image d'arrière-plan"
                   aspectRatio="16/9"
                 />
+              </div>
+            </section>
+
+            {/* Réseaux sociaux */}
+            <section className="rounded-lg border border-gray-200 bg-white p-6">
+              <h2 className="mb-4 text-lg font-semibold text-gray-900">
+                Réseaux sociaux
+              </h2>
+              <div className="space-y-4 max-w-md">
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700">Instagram</label>
+                  <input
+                    type="url"
+                    value={socialInstagramUrl}
+                    onChange={(e) => setSocialInstagramUrl(e.target.value)}
+                    placeholder="https://instagram.com/..."
+                    className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700">Facebook</label>
+                  <input
+                    type="url"
+                    value={socialFacebookUrl}
+                    onChange={(e) => setSocialFacebookUrl(e.target.value)}
+                    placeholder="https://facebook.com/..."
+                    className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700">LinkedIn</label>
+                  <input
+                    type="url"
+                    value={socialLinkedinUrl}
+                    onChange={(e) => setSocialLinkedinUrl(e.target.value)}
+                    placeholder="https://linkedin.com/in/..."
+                    className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
               </div>
             </section>
           </>
