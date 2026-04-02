@@ -22,6 +22,9 @@ export const SETTINGS_QUERY = `
       footer_logo_url
       nav_menu_order
       nav_dropdown_order
+      social_instagram_url
+      social_behance_url
+      social_linkedin_url
       updated_at
     }
   }
@@ -47,6 +50,9 @@ export const HOMEPAGE_QUERY = `
       footer_logo_url
       nav_menu_order
       nav_dropdown_order
+      social_instagram_url
+      social_behance_url
+      social_linkedin_url
     }
     homepage {
       heroImages {

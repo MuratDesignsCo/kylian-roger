@@ -21,7 +21,7 @@ export const projectsResolvers = {
       if (conditions.length > 0) {
         query += ' WHERE ' + conditions.join(' AND ')
       }
-      query += ' ORDER BY project_date DESC NULLS LAST, year DESC, created_at DESC'
+      query += ' ORDER BY sort_order ASC, project_date DESC NULLS LAST, year DESC, created_at DESC'
 
       const { rows } = await pool.query(query, values)
       return rows
@@ -149,6 +149,14 @@ export const projectsResolvers = {
       requireAuth(context)
       const { rowCount } = await pool.query('DELETE FROM projects WHERE id = $1', [id])
       return (rowCount ?? 0) > 0
+    },
+
+    reorderProjects: async (_: unknown, { ids }: { ids: string[] }, context: GqlContext) => {
+      requireAuth(context)
+      for (let i = 0; i < ids.length; i++) {
+        await pool.query('UPDATE projects SET sort_order = $1 WHERE id = $2', [i, ids[i]])
+      }
+      return true
     },
 
     saveGalleryRows: async (_: unknown, { projectId, rows: rowInputs }: { projectId: string; rows: Array<Record<string, unknown>> }, context: GqlContext) => {

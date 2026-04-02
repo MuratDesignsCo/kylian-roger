@@ -20,6 +20,9 @@ export interface SiteSettings {
   footer_logo_url: string
   nav_menu_order: string[]
   nav_dropdown_order: string[]
+  social_instagram_url: string
+  social_behance_url: string
+  social_linkedin_url: string
   updated_at: string
 }
 
