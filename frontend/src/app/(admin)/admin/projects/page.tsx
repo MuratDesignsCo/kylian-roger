@@ -314,7 +314,6 @@ function CategoryProjectList({ category }: { category: string }) {
             <ProjectItem
               key={project.id}
               project={project}
-              category={category}
               formatDate={formatDate}
               onDelete={handleDelete}
               deletingId={deletingId}
