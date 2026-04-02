@@ -23,6 +23,9 @@ const typeDefs = gql`
     footer_logo_url: String!
     nav_menu_order: JSON!
     nav_dropdown_order: JSON!
+    social_instagram_url: String!
+    social_behance_url: String!
+    social_linkedin_url: String!
     updated_at: String!
   }
 
@@ -278,6 +281,9 @@ const typeDefs = gql`
     footer_logo_url: String
     nav_menu_order: JSON
     nav_dropdown_order: JSON
+    social_instagram_url: String
+    social_behance_url: String
+    social_linkedin_url: String
   }
 
   input SeoPageInput {
@@ -468,6 +474,7 @@ const typeDefs = gql`
     createProject(input: ProjectInput!): Project!
     updateProject(id: ID!, input: ProjectInput!): Project!
     deleteProject(id: ID!): Boolean!
+    reorderProjects(ids: [ID!]!): Boolean!
 
     # Project nested data
     saveGalleryRows(projectId: ID!, rows: [GalleryRowInput!]!): [ProjectGalleryRow!]!

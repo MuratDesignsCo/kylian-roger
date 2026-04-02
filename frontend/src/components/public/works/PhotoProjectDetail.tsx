@@ -22,7 +22,7 @@ function layoutToClass(layout: string): string {
     case 'full': return 'is-full'
     case 'half': return 'is-landscape'
     case 'third': return 'is-portrait'
-    case 'quarter': return 'is-portrait'
+    case 'quarter': return 'is-quarter'
     default: return 'is-landscape'
   }
 }
