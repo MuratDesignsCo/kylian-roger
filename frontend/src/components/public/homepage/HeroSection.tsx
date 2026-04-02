@@ -58,11 +58,17 @@ export default function HeroSection({
 
     const imageEls = Array.from(imageRefsMap.current.values())
 
+    // Compute initial scale: container is at full size in CSS,
+    // we scale it down to appear as the original small size (~28vw)
+    const containerRect = container.getBoundingClientRect()
+    const targetSmallWidth = window.innerWidth * 0.28
+    const initialScale = isMobile ? 1 : targetSmallWidth / containerRect.width
+
     // --- Hero timeline ---
     const heroTl = gsap.timeline({ delay: 0.2 })
 
-    // 1. Container visible at scale(0.9), all images hidden
-    heroTl.set(container, { visibility: 'visible', scale: 0.9 })
+    // 1. Container visible at reduced scale, all images hidden
+    heroTl.set(container, { visibility: 'visible', scale: initialScale * 0.9 })
     heroTl.set(imageEls, { visibility: 'hidden', opacity: 0 })
 
     // 2. Flash through images rapidly
@@ -74,8 +80,8 @@ export default function HeroSection({
       heroTl.to(img, { scale: 1, duration: 0.15, ease: 'none' })
     })
 
-    // 3. Scale container from 0.9 to 1
-    heroTl.to(container, { scale: 1, duration: 1.2, ease: 'power2.out' })
+    // 3. Scale container from initialScale*0.9 to initialScale
+    heroTl.to(container, { scale: initialScale, duration: 1.2, ease: 'power2.out' })
 
     // 4. Name text top - slide up from below (overflow-hidden mask)
     heroTl.fromTo(
@@ -116,27 +122,11 @@ export default function HeroSection({
     }, [], rolePosition)
 
     // 8. Setup scroll expansion after intro completes
-    let cachedFullScale = 1
-
-    const computeFullscreenScale = () => {
-      const heroPadding = window.innerWidth <= 767 ? 16 : 80
-      const currentScale = (gsap.getProperty(container, 'scaleX') as number) || 1
-      const rect = container.getBoundingClientRect()
-      const baseW = rect.width / currentScale
-      const baseH = rect.height / currentScale
-      const targetW = window.innerWidth - heroPadding * 2
-      const targetH = window.innerHeight - heroPadding * 2
-      const scaleX = targetW / baseW
-      const scaleY = targetH / baseH
-      return Math.min(scaleX, scaleY)
-    }
-
+    // Container is now at full CSS size; scroll goes from initialScale to ~1
     heroTl.call(() => {
       lenis?.start()
 
       if (!isMobile) {
-        cachedFullScale = computeFullscreenScale()
-
         scrollTriggerRef.current = ScrollTrigger.create({
           trigger: pinWrapper,
           start: 'top top',
@@ -144,16 +134,10 @@ export default function HeroSection({
           pin: section,
           scrub: true,
           onUpdate: (self) => {
-            const targetScale = 1 + (cachedFullScale - 1) * 0.98 * self.progress
+            const targetScale = initialScale + (1 - initialScale) * 0.98 * self.progress
             gsap.set(container, { scale: targetScale })
           },
         })
-
-        const onResize = () => {
-          cachedFullScale = computeFullscreenScale()
-        }
-        resizeHandlerRef.current = onResize
-        window.addEventListener('resize', onResize)
 
         ScrollTrigger.refresh()
       }
