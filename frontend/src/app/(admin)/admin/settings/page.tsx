@@ -68,6 +68,11 @@ function SettingsEditor() {
   const [footerLogoUrl, setFooterLogoUrl] = useState('')
   const [copyrightText, setCopyrightText] = useState('')
 
+  // Social links
+  const [socialInstagram, setSocialInstagram] = useState('')
+  const [socialBehance, setSocialBehance] = useState('')
+  const [socialLinkedin, setSocialLinkedin] = useState('')
+
   useEffect(() => {
     loadSettings()
   }, [])
@@ -81,6 +86,9 @@ function SettingsEditor() {
         setNavbarLogoUrl(s.navbar_logo_url || '')
         setFooterLogoUrl(s.footer_logo_url || '')
         setCopyrightText(s.copyright_text || '')
+        setSocialInstagram(s.social_instagram_url || '')
+        setSocialBehance(s.social_behance_url || '')
+        setSocialLinkedin(s.social_linkedin_url || '')
 
         // Rebuild menu items from saved order
         if (s.nav_menu_order && Array.isArray(s.nav_menu_order) && s.nav_menu_order.length > 0) {
@@ -117,6 +125,9 @@ function SettingsEditor() {
           copyright_text: copyrightText,
           nav_menu_order: menuItems.map((m) => m.id),
           nav_dropdown_order: dropdownItems.map((d) => d.id),
+          social_instagram_url: socialInstagram,
+          social_behance_url: socialBehance,
+          social_linkedin_url: socialLinkedin,
         },
       }, token)
       toast.success('Paramètres enregistrés')
@@ -240,6 +251,43 @@ function SettingsEditor() {
                 type="text"
                 value={copyrightText}
                 onChange={(e) => setCopyrightText(e.target.value)}
+                className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Social Links */}
+        <section className="rounded-lg border border-gray-200 bg-white p-6">
+          <h2 className="mb-6 text-lg font-semibold text-gray-900">Réseaux sociaux</h2>
+          <div className="space-y-4 max-w-md">
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-gray-700">Instagram</label>
+              <input
+                type="url"
+                value={socialInstagram}
+                onChange={(e) => setSocialInstagram(e.target.value)}
+                placeholder="https://instagram.com/..."
+                className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-gray-700">Behance</label>
+              <input
+                type="url"
+                value={socialBehance}
+                onChange={(e) => setSocialBehance(e.target.value)}
+                placeholder="https://behance.net/..."
+                className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-gray-700">LinkedIn</label>
+              <input
+                type="url"
+                value={socialLinkedin}
+                onChange={(e) => setSocialLinkedin(e.target.value)}
+                placeholder="https://linkedin.com/in/..."
                 className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               />
             </div>

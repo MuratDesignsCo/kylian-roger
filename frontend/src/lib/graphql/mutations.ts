@@ -34,6 +34,9 @@ export const UPDATE_SETTINGS_MUTATION = `
       footer_logo_url
       nav_menu_order
       nav_dropdown_order
+      social_instagram_url
+      social_behance_url
+      social_linkedin_url
     }
   }
 `
@@ -100,6 +103,12 @@ export const UPDATE_PROJECT_MUTATION = `
 export const DELETE_PROJECT_MUTATION = `
   mutation DeleteProject($id: ID!) {
     deleteProject(id: $id)
+  }
+`
+
+export const REORDER_PROJECTS_MUTATION = `
+  mutation ReorderProjects($ids: [ID!]!) {
+    reorderProjects(ids: $ids)
   }
 `
 

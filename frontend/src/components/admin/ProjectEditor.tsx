@@ -540,7 +540,7 @@ export default function ProjectEditorPage({ id, defaultCategory }: ProjectEditor
     const token = getAuthToken()
     const currentRow = galleryRows.find(r => r.tempId === rowTempId)
     const currentCount = currentRow ? currentRow.images.filter(img => img.image_url).length : 0
-    const maxToAdd = 3 - currentCount
+    const maxToAdd = 4 - currentCount
 
     for (let i = 0; i < Math.min(files.length, maxToAdd); i++) {
       const file = files[i]
@@ -643,7 +643,7 @@ export default function ProjectEditorPage({ id, defaultCategory }: ProjectEditor
     const token = getAuthToken()
     const currentBlock = contentBlocks.find((b) => b.tempId === blockTempId)
     const currentCount = currentBlock ? currentBlock.images.filter((img) => img.image_url).length : 0
-    const maxToAdd = 3 - currentCount
+    const maxToAdd = 4 - currentCount
 
     for (let i = 0; i < Math.min(files.length, maxToAdd); i++) {
       const file = files[i]
@@ -1050,8 +1050,8 @@ export default function ProjectEditorPage({ id, defaultCategory }: ProjectEditor
                         </div>
                       ))}
 
-                      {/* Bouton + : ouvre directement le sélecteur de fichiers (max 3 par rangée) */}
-                      {row.images.filter(img => img.image_url).length < 3 && (
+                      {/* Bouton + : ouvre directement le sélecteur de fichiers (max 4 par rangée) */}
+                      {row.images.filter(img => img.image_url).length < 4 && (
                         <label className="flex aspect-square w-28 cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 text-gray-400 transition-colors hover:border-gray-400 hover:text-gray-600">
                           <Plus className="h-5 w-5" />
                           <input

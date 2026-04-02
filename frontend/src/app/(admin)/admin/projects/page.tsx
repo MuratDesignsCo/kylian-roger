@@ -2,13 +2,17 @@
 
 import { useEffect, useState, Suspense } from 'react'
 import Link from 'next/link'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { gqlRequest } from '@/lib/graphql/client'
 import { PROJECTS_QUERY } from '@/lib/graphql/queries'
-import { DELETE_PROJECT_MUTATION } from '@/lib/graphql/mutations'
+import { DELETE_PROJECT_MUTATION, REORDER_PROJECTS_MUTATION } from '@/lib/graphql/mutations'
 import { getAuthToken } from '@/components/admin/AuthGuard'
 import toast from 'react-hot-toast'
-import { Camera, Film, Palette, Plus, Trash2, Loader2, ArrowLeft, ArrowUpDown } from 'lucide-react'
+import { Camera, Film, Palette, Plus, Trash2, Loader2, ArrowLeft, ArrowUpDown, GripVertical } from 'lucide-react'
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
+import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+import { arrayMove } from '@dnd-kit/sortable'
 import AuthGuard from '@/components/admin/AuthGuard'
 import AdminSidebar from '@/components/admin/AdminSidebar'
 import type { Project } from '@/lib/types'
@@ -120,14 +124,18 @@ function CategoryCards() {
 // Vue 2 : Liste filtrée par catégorie
 // ============================================================
 
-type SortOrder = 'recent' | 'oldest'
+type SortOrder = 'custom' | 'recent' | 'oldest'
 
 function CategoryProjectList({ category }: { category: string }) {
-  const router = useRouter()
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [deletingId, setDeletingId] = useState<string | null>(null)
-  const [sort, setSort] = useState<SortOrder>('recent')
+  const [sort, setSort] = useState<SortOrder>('custom')
+  const [saving, setSaving] = useState(false)
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+  )
 
   const fetchProjects = async () => {
     setLoading(true)
@@ -166,13 +174,40 @@ function CategoryProjectList({ category }: { category: string }) {
     setDeletingId(null)
   }
 
-  const sortedProjects = [...projects].sort((a, b) => {
-    const dateA = a.project_date || `${a.year}-01-01`
-    const dateB = b.project_date || `${b.year}-01-01`
-    return sort === 'recent'
-      ? dateB.localeCompare(dateA)
-      : dateA.localeCompare(dateB)
-  })
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+
+    const oldIndex = projects.findIndex((p) => p.id === active.id)
+    const newIndex = projects.findIndex((p) => p.id === over.id)
+    if (oldIndex === -1 || newIndex === -1) return
+
+    const reordered = arrayMove(projects, oldIndex, newIndex)
+    setProjects(reordered)
+
+    setSaving(true)
+    try {
+      const token = getAuthToken()
+      await gqlRequest(REORDER_PROJECTS_MUTATION, {
+        ids: reordered.map((p) => p.id),
+      }, token)
+      toast.success('Ordre sauvegardé')
+    } catch {
+      toast.error('Erreur lors de la sauvegarde')
+      fetchProjects()
+    }
+    setSaving(false)
+  }
+
+  const displayProjects = sort === 'custom'
+    ? projects
+    : [...projects].sort((a, b) => {
+        const dateA = a.project_date || `${a.year}-01-01`
+        const dateB = b.project_date || `${b.year}-01-01`
+        return sort === 'recent'
+          ? dateB.localeCompare(dateA)
+          : dateA.localeCompare(dateB)
+      })
 
   const label = categoryLabels[category] || category
 
@@ -202,6 +237,7 @@ function CategoryProjectList({ category }: { category: string }) {
             <h1 className="text-2xl font-bold text-gray-900">{label}</h1>
             <p className="mt-0.5 text-sm text-gray-400">
               {projects.length} projet{projects.length > 1 ? 's' : ''}
+              {saving && ' — sauvegarde...'}
             </p>
           </div>
         </div>
@@ -219,29 +255,24 @@ function CategoryProjectList({ category }: { category: string }) {
         <div className="mb-6 flex items-center gap-3">
           <ArrowUpDown className="h-4 w-4 text-gray-400" />
           <div className="flex gap-1 rounded-lg bg-gray-100 p-1">
-            <button
-              type="button"
-              onClick={() => setSort('recent')}
-              className={`rounded-md px-3 py-1 text-xs font-medium transition-all ${
-                sort === 'recent'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Plus récents
-            </button>
-            <button
-              type="button"
-              onClick={() => setSort('oldest')}
-              className={`rounded-md px-3 py-1 text-xs font-medium transition-all ${
-                sort === 'oldest'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Plus anciens
-            </button>
+            {(['custom', 'recent', 'oldest'] as const).map((s) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => setSort(s)}
+                className={`rounded-md px-3 py-1 text-xs font-medium transition-all ${
+                  sort === s
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                {s === 'custom' ? 'Personnalisé' : s === 'recent' ? 'Plus récents' : 'Plus anciens'}
+              </button>
+            ))}
           </div>
+          {sort === 'custom' && (
+            <span className="text-xs text-gray-400">Glissez pour réordonner</span>
+          )}
         </div>
       )}
 
@@ -261,54 +292,167 @@ function CategoryProjectList({ category }: { category: string }) {
             Créer votre premier projet
           </Link>
         </div>
+      ) : sort === 'custom' ? (
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext items={displayProjects.map((p) => p.id)} strategy={verticalListSortingStrategy}>
+            <div className="space-y-3">
+              {displayProjects.map((project) => (
+                <SortableProjectItem
+                  key={project.id}
+                  project={project}
+                  formatDate={formatDate}
+                  onDelete={handleDelete}
+                  deletingId={deletingId}
+                />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
       ) : (
         <div className="space-y-3">
-          {sortedProjects.map((project) => (
-            <Link
+          {displayProjects.map((project) => (
+            <ProjectItem
               key={project.id}
-              href={`/admin/projects/${project.id}`}
-              className="group flex items-center gap-5 rounded-xl border border-gray-100 bg-white p-4 transition-all hover:border-gray-200 hover:shadow-md"
-            >
-              {/* Cover */}
-              {project.cover_image_url ? (
-                <img
-                  src={project.cover_image_url}
-                  alt={project.cover_image_alt || project.title}
-                  className="h-20 w-28 shrink-0 rounded-lg object-cover"
-                />
-              ) : (
-                <div className="flex h-20 w-28 shrink-0 items-center justify-center rounded-lg bg-gray-100">
-                  <Camera className="h-5 w-5 text-gray-300" />
-                </div>
-              )}
-
-              {/* Info */}
-              <div className="min-w-0 flex-1">
-                <h3 className="text-base font-semibold text-gray-900 group-hover:text-black">
-                  {project.title}
-                </h3>
-                <p className="mt-1 text-sm text-gray-400">
-                  {formatDate(project)}
-                </p>
-              </div>
-
-              {/* Delete */}
-              <button
-                onClick={(e) => handleDelete(e, project)}
-                disabled={deletingId === project.id}
-                className="shrink-0 rounded-lg p-2.5 text-gray-300 opacity-0 transition-all hover:bg-red-50 hover:text-red-500 group-hover:opacity-100 disabled:opacity-50"
-                title="Supprimer"
-              >
-                {deletingId === project.id ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Trash2 className="h-4 w-4" />
-                )}
-              </button>
-            </Link>
+              project={project}
+              category={category}
+              formatDate={formatDate}
+              onDelete={handleDelete}
+              deletingId={deletingId}
+            />
           ))}
         </div>
       )}
+    </div>
+  )
+}
+
+// ============================================================
+// Project item (non-sortable)
+// ============================================================
+
+function ProjectItem({
+  project,
+  formatDate,
+  onDelete,
+  deletingId,
+}: {
+  project: Project
+  formatDate: (p: Project) => string
+  onDelete: (e: React.MouseEvent, p: Project) => void
+  deletingId: string | null
+}) {
+  return (
+    <Link
+      href={`/admin/projects/${project.id}`}
+      className="group flex items-center gap-5 rounded-xl border border-gray-100 bg-white p-4 transition-all hover:border-gray-200 hover:shadow-md"
+    >
+      {project.cover_image_url ? (
+        <img
+          src={project.cover_image_url}
+          alt={project.cover_image_alt || project.title}
+          className="h-20 w-28 shrink-0 rounded-lg object-cover"
+        />
+      ) : (
+        <div className="flex h-20 w-28 shrink-0 items-center justify-center rounded-lg bg-gray-100">
+          <Camera className="h-5 w-5 text-gray-300" />
+        </div>
+      )}
+      <div className="min-w-0 flex-1">
+        <h3 className="text-base font-semibold text-gray-900 group-hover:text-black">
+          {project.title}
+        </h3>
+        <p className="mt-1 text-sm text-gray-400">{formatDate(project)}</p>
+      </div>
+      <button
+        onClick={(e) => onDelete(e, project)}
+        disabled={deletingId === project.id}
+        className="shrink-0 rounded-lg p-2.5 text-gray-300 opacity-0 transition-all hover:bg-red-50 hover:text-red-500 group-hover:opacity-100 disabled:opacity-50"
+        title="Supprimer"
+      >
+        {deletingId === project.id ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <Trash2 className="h-4 w-4" />
+        )}
+      </button>
+    </Link>
+  )
+}
+
+// ============================================================
+// Sortable project item (drag-and-drop)
+// ============================================================
+
+function SortableProjectItem({
+  project,
+  formatDate,
+  onDelete,
+  deletingId,
+}: {
+  project: Project
+  formatDate: (p: Project) => string
+  onDelete: (e: React.MouseEvent, p: Project) => void
+  deletingId: string | null
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: project.id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  }
+
+  return (
+    <div ref={setNodeRef} style={style} className="flex items-center gap-2">
+      <button
+        type="button"
+        className="shrink-0 cursor-grab rounded p-1 text-gray-300 hover:text-gray-500 active:cursor-grabbing"
+        {...attributes}
+        {...listeners}
+      >
+        <GripVertical className="h-5 w-5" />
+      </button>
+      <Link
+        href={`/admin/projects/${project.id}`}
+        className="group flex flex-1 items-center gap-5 rounded-xl border border-gray-100 bg-white p-4 transition-all hover:border-gray-200 hover:shadow-md"
+      >
+        {project.cover_image_url ? (
+          <img
+            src={project.cover_image_url}
+            alt={project.cover_image_alt || project.title}
+            className="h-20 w-28 shrink-0 rounded-lg object-cover"
+          />
+        ) : (
+          <div className="flex h-20 w-28 shrink-0 items-center justify-center rounded-lg bg-gray-100">
+            <Camera className="h-5 w-5 text-gray-300" />
+          </div>
+        )}
+        <div className="min-w-0 flex-1">
+          <h3 className="text-base font-semibold text-gray-900 group-hover:text-black">
+            {project.title}
+          </h3>
+          <p className="mt-1 text-sm text-gray-400">{formatDate(project)}</p>
+        </div>
+        <button
+          onClick={(e) => onDelete(e, project)}
+          disabled={deletingId === project.id}
+          className="shrink-0 rounded-lg p-2.5 text-gray-300 opacity-0 transition-all hover:bg-red-50 hover:text-red-500 group-hover:opacity-100 disabled:opacity-50"
+          title="Supprimer"
+        >
+          {deletingId === project.id ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Trash2 className="h-4 w-4" />
+          )}
+        </button>
+      </Link>
     </div>
   )
 }
