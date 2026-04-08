@@ -216,6 +216,12 @@ export default function PhotoProjectDetail({
                           loading="lazy"
                           alt={image.alt_text || project.title}
                           className="project-gallery_image"
+                          onLoad={(e) => {
+                            const img = e.currentTarget
+                            const ratio = img.naturalWidth / img.naturalHeight
+                            const item = img.closest('.project-gallery_item') as HTMLElement
+                            if (item) item.style.flex = `${ratio} 1 0%`
+                          }}
                         />
                       </div>
                     </div>
