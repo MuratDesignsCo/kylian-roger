@@ -16,16 +16,6 @@ interface PhotoProjectDetailProps {
   heroSlides: ProjectHeroSlide[]
 }
 
-// Map row layout to CSS item class
-function layoutToClass(layout: string): string {
-  switch (layout) {
-    case 'full': return 'is-full'
-    case 'half': return 'is-landscape'
-    case 'third': return 'is-portrait'
-    case 'quarter': return 'is-quarter'
-    default: return 'is-landscape'
-  }
-}
 
 export default function PhotoProjectDetail({
   project,
@@ -211,25 +201,27 @@ export default function PhotoProjectDetail({
           <div className="padding-global">
             <div className="spacer-xxhuge"></div>
             <div className="project-gallery_grid">
-              {galleryRows.map((row, rowIdx) =>
-                (row.project_gallery_images ?? []).map((image, imgIdx) => (
-                  <div
-                    key={image.id}
-                    className={`project-gallery_item ${layoutToClass(row.layout)}`}
-                    onClick={() => setLightboxIndex(getFlatIndex(rowIdx, imgIdx))}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <div className="project-gallery_image-wrapper">
-                      <img
-                        src={image.image_url}
-                        loading="lazy"
-                        alt={image.alt_text || project.title}
-                        className="project-gallery_image"
-                      />
+              {galleryRows.map((row, rowIdx) => (
+                <div key={row.id} className="project-gallery_row">
+                  {(row.project_gallery_images ?? []).map((image, imgIdx) => (
+                    <div
+                      key={image.id}
+                      className="project-gallery_item"
+                      onClick={() => setLightboxIndex(getFlatIndex(rowIdx, imgIdx))}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <div className="project-gallery_image-wrapper">
+                        <img
+                          src={image.image_url}
+                          loading="lazy"
+                          alt={image.alt_text || project.title}
+                          className="project-gallery_image"
+                        />
+                      </div>
                     </div>
-                  </div>
-                ))
-              )}
+                  ))}
+                </div>
+              ))}
             </div>
             <div className="spacer-xxhuge"></div>
             <div className="project-gallery_back">
